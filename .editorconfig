@@ -1,0 +1,5 @@
+root = true \#define que esse é o arquivo que valerá para todos os arquivos abaixo dele
+
+[*] \#será usado em todas os tipos de arquivo (caso contrário podes especificar um só como [.js]
+indent_size = 2
+indent_style = space

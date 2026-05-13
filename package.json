@@ -1,0 +1,21 @@
+{
+  "name": "restaurante-saas",
+  "version": "1.0.0",
+  "description": "saas para restaurantes gerenciarem reservas e vouchers",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "lint:check": "prettier --check .",
+    "lint:fix": "prettier --write ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}
