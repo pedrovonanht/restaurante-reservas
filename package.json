@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "lint:check": "prettier --check .",
-    "lint:fix": "prettier --write .",
-    "lint:eslint:check": "next lint",
+    "lint:prettier:check": "prettier --check .",
+    "lint:prettier:fix": "prettier --write .",
+    "lint:eslint:check": "npx eslint .",
     "test": "jest"
   },
   "author": "",
