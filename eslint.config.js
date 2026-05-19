@@ -12,7 +12,7 @@ export default defineConfig([
     plugins: {
       jest: jestPlugin, //nomeia o plugin para funcionar
     },
-    files: ["tests/*.test.js"],
+    files: ["**/*.test.js"],
     ...jestPlugin.configs["flat/recommended"],
     languageOptions: {
       globals: jestPlugin.environments.globals.globals, //seta as variáveis globais
