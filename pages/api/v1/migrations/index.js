@@ -1,7 +1,23 @@
-import migrator from "models/migrator.js"
+import migrator from "models/migrator.js";
+import { createRouter } from "next-connect";
 
-export default async function migrations(request, response) {
-    const listedMigrations = await migrator.listPendingMigrations();
-    
-    return response.status(200).json(listedMigrations);
+const router = createRouter();
+router.get(getHandler);
+router.post(postHandler);
+
+export default router.handler();
+
+async function getHandler(request, response) {
+  const listedMigrations = await migrator.listPendingMigrations();
+
+  return response.status(200).json(listedMigrations);
+}
+
+async function postHandler(request, response) {
+  const migratedMigrations = await migrator.runPendingMigrations();
+  if (migratedMigrations.length > 0) {
+    return response.status(201).json(migratedMigrations);
+  } else {
+    return response.status(200).json(migratedMigrations);
+  }
 }

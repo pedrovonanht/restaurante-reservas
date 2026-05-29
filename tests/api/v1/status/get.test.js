@@ -1,7 +1,7 @@
 import orchestrator from "tests/orchestrator";
 
-beforeAll(() => {
-  orchestrator.clearDatabase();
+beforeAll(async() => {
+  await orchestrator.clearDatabase();
 });
 
 test("GET `api/v1/status`", async () => {

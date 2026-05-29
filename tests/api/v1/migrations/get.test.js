@@ -1,8 +1,8 @@
-import orchestrator from "tests/orchestrator.js"
+import orchestrator from "tests/orchestrator.js";
 
-beforeAll(() => {
-  orchestrator.clearDatabase();
-})
+beforeAll(async () => {
+  await orchestrator.clearDatabase();
+});
 
 describe("GET IN `api/v1/migrations`", () => {
   describe("With anonymouse user", () => {
