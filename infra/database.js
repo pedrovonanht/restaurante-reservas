@@ -9,6 +9,7 @@ async function getNewClient() {
     user: process.env.POSTGRES_USER || "postgres",
     database: process.env.POSTGRES_DB || "postgres",
     password: process.env.POSTGRES_PASSWORD || "local",
+    ssl: process.env.NODE_ENV == "production" ? true : false,
   });
 
   await client.connect();
