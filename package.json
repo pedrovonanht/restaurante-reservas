@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm run services:up && npm run service:wait:database && npm run migrations:up && next dev",
+    "service:wait:database": "node infra/scripts/wait-for-postgres.js",
     "migrations:create": "node-pg-migrate -m 'infra/migrations' --env-path .env.development create",
     "migrations:up": "node-pg-migrate -m 'infra/migrations' --env-path .env.development up",
     "services:up": "docker compose --file 'infra/compose.yaml' up -d",
