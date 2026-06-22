@@ -1,8 +1,8 @@
 import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
-  await orchestrator.clearDatabase();
   await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
 });
 
 describe("GET in `api/v1/migrations`", () => {
@@ -12,7 +12,7 @@ describe("GET in `api/v1/migrations`", () => {
         method: "POST",
       });
       expect(request.status).toBe(201);
-
+      
       const requestBody = await request.json();
       expect(Array.isArray(requestBody)).toBe(true);
       expect(requestBody.length).toBeGreaterThan(0);
