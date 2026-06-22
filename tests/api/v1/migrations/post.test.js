@@ -12,7 +12,7 @@ describe("GET in `api/v1/migrations`", () => {
         method: "POST",
       });
       expect(request.status).toBe(201);
-      
+
       const requestBody = await request.json();
       expect(Array.isArray(requestBody)).toBe(true);
       expect(requestBody.length).toBeGreaterThan(0);
@@ -20,7 +20,7 @@ describe("GET in `api/v1/migrations`", () => {
 
     test("For the second time", async () => {
       const request = await fetch("http://localhost:3000/api/v1/migrations", {
-        method: "POST"
+        method: "POST",
       });
       expect(request.status).toBe(200);
 

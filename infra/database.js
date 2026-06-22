@@ -28,7 +28,7 @@ async function query(queryObject) {
       message: "Erro no banco de dados ou na query",
       cause: error,
     });
-    throw new publicErrorObject;
+    throw new publicErrorObject();
   } finally {
     await client.end();
   }
