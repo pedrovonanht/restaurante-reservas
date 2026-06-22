@@ -1,6 +1,13 @@
+import controller from "infra/controller";
 import database from "infra/database.js";
+import { createRouter } from "next-connect";
 
-export default async function status(request, response) {
+const router = createRouter();
+router.get(getHandler);
+
+export default router.handler(controller.errorHandlers);
+
+async function getHandler(request, response) {
   const result = await database.query({
     text: `
       SELECT

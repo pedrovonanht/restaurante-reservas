@@ -1,8 +1,8 @@
 import orchestrator from "tests/orchestrator.js";
 
 beforeAll(async () => {
-  await orchestrator.clearDatabase();
   await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
 });
 
 describe("GET in `api/v1/migrations`", () => {
@@ -20,7 +20,7 @@ describe("GET in `api/v1/migrations`", () => {
 
     test("For the second time", async () => {
       const request = await fetch("http://localhost:3000/api/v1/migrations", {
-        method: "POST"
+        method: "POST",
       });
       expect(request.status).toBe(200);
 
