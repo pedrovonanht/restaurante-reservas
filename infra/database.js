@@ -1,4 +1,5 @@
 import pg from "pg";
+import { ServiceError } from "./error";
 
 const { Client } = pg;
 
@@ -17,11 +18,17 @@ async function getNewClient() {
 }
 
 async function query(queryObject) {
-  const client = await getNewClient();
-
+  let client;
   try {
+    client = await getNewClient();
     const result = await client.query(queryObject);
     return result;
+  } catch (error) {
+    const publicErrorObject = new ServiceError({
+      message: "Erro no banco de dados ou na query",
+      cause: error,
+    });
+    throw new publicErrorObject;
   } finally {
     await client.end();
   }
