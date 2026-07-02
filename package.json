@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "saas para restaurantes gerenciarem reservas e vouchers",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "npm run services:up && npm run service:wait:database && npm run migrations:up && next dev",
     "service:wait:database": "node infra/scripts/wait-for-postgres.js",
