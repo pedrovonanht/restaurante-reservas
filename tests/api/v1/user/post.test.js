@@ -60,7 +60,7 @@ describe("POST in `api/v1/user`", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "usedUsername",
+          username: "usedusername",
           password: "firstpassword",
           email: "usedUsername@gmail.com",
         }),
@@ -73,7 +73,7 @@ describe("POST in `api/v1/user`", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "usedUsername",
+          username: "Usedusername",
           password: "firstpassword2",
           email: "uneusedUsername2@gmail.com",
         }),
@@ -108,7 +108,7 @@ describe("POST in `api/v1/user`", () => {
         },
         body: JSON.stringify({
           username: "emailduplicado2",
-          password: "emailduplicado1233",
+          password: "Emailduplicado1233",
           email: "emailduplicado@gmail.com",
         }),
       });
