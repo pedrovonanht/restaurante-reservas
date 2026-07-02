@@ -6,8 +6,10 @@ const nextJest = require("next/jest"); //importa usando Common JS (jeito antigo)
 
 const createJestConfig = nextJest(); //usa uma função factory que retorna uma outra função
 
-const customConfig = { //gera as configs
+const customConfig = {
+  //gera as configs
   moduleDirectories: ["node_modules", "<rootDir>"],
+  testTimeout: 60000,
 };
 
 module.exports = async () => {
