@@ -10,8 +10,8 @@ beforeAll(async () => {
 });
 
 describe("POST in `api/v1/user`", () => {
-  describe("With anonymouse user", () => {
-    test("For the first time", async () => {
+  describe("Anonymouse user", () => {
+    test("With valid data", async () => {
       const response = await fetch("http://localhost:3000/api/v1/user", {
         method: "POST",
         headers: {
