@@ -1,5 +1,5 @@
 import database from "infra/database.js";
-import { ValidationError } from "infra/error.js";
+import { NotFoundError, ValidationError } from "infra/error.js";
 import password from "models/password.js";
 
 async function create(userInputValues) {
@@ -26,14 +26,34 @@ async function create(userInputValues) {
 }
 
 async function findOneByUsername(username) {
-  const result = await database.query({
-    text: `SELECT * FROM users WHERE LOWER(username) = LOWER($1)`,
-    values: [username],
-  });
+  const foundUserObject = await runSelectQuery(username);
+  return foundUserObject;
 
-  return result.rows[0];
+  async function runSelectQuery(username) {
+    console.log(username)
+    const result = await database.query({
+     text: `
+      SELECT
+      *
+      FROM
+      users
+      WHERE
+      LOWER(username) = LOWER($1)
+      LIMIT
+      10
+      ;`,
+      values: [username],
+    });
+    console.log(result.rows[0])
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O username informado não foi encontrado no sistema.",
+        action: "Verifique o nome de usuário informado.",
+      });
+    }
+    return result.rows[0];
+  }
 }
-
 
 async function validateUniqueUsername(username) {
   const result = await database.query({
@@ -63,5 +83,5 @@ async function validateUniqueEmail(email) {
   }
 }
 
-const user = { create, findOneByUsername}
+const user = { create, findOneByUsername };
 export default user;
