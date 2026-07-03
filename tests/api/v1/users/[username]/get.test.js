@@ -83,7 +83,7 @@ describe("POST in `api/v1/user`", () => {
       expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "O username informado não foi encontrado no sistema.",
-        action: "Verifique o nome de usuário informado.",
+        action: "Verifique o username informado.",
         status_code: 404,
       });
     });
