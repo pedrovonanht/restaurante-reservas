@@ -1,5 +1,5 @@
 import database from "infra/database.js";
-import { ValidationError } from "infra/error.js";
+import { NotFoundError, ValidationError } from "infra/error.js";
 import password from "models/password.js";
 
 async function create(userInputValues) {
@@ -25,15 +25,79 @@ async function create(userInputValues) {
   return result.rows[0];
 }
 
-async function findOneByUsername(username) {
-  const result = await database.query({
-    text: `SELECT * FROM users WHERE LOWER(username) = LOWER($1)`,
-    values: [username],
-  });
+async function update(username, userInputValues) {
+  if (!userInputValues || Object.keys(userInputValues).length === 0) {
+    throw new ValidationError({
+      message: "A requisição espera um objeto, que não foi enviado.",
+      action: "Verifique o corpo da requisição.",
+    });
+  }
 
-  return result.rows[0];
+  const currentUser = await findOneByUsername(username);
+
+  if (
+    "username" in userInputValues &&
+    username.toLowerCase() !== userInputValues.username.toLowerCase()
+  ) {
+    await validateUniqueUsername(userInputValues.username);
+  }
+
+  if ("email" in userInputValues) {
+    await validateUniqueEmail(userInputValues.email);
+  }
+
+  if (userInputValues.password) {
+    userInputValues.password = await password.hash(userInputValues.password);
+  }
+
+  const userWithNewValues = { ...currentUser, ...userInputValues };
+
+  return await runUpdateQuery(userWithNewValues);
+
+  async function runUpdateQuery(userWithNewValues) {
+    const result = await database.query({
+      text: `UPDATE users
+             SET username=$1, email=$2, password=$3, updated_at=now()
+             WHERE id=$4
+             RETURNING *`,
+      values: [
+        userWithNewValues.username,
+        userWithNewValues.email,
+        userWithNewValues.password,
+        userWithNewValues.id,
+      ],
+    });
+    return result.rows[0];
+  }
 }
 
+async function findOneByUsername(username) {
+  const foundUserObject = await runSelectQuery(username);
+  return foundUserObject;
+
+  async function runSelectQuery(username) {
+    const result = await database.query({
+      text: `
+      SELECT
+      *
+      FROM
+      users
+      WHERE
+      LOWER(username) = LOWER($1)
+      LIMIT
+      10
+      ;`,
+      values: [username],
+    });
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O username informado não foi encontrado no sistema.",
+        action: "Verifique o username informado.",
+      });
+    }
+    return result.rows[0];
+  }
+}
 
 async function validateUniqueUsername(username) {
   const result = await database.query({
@@ -63,5 +127,5 @@ async function validateUniqueEmail(email) {
   }
 }
 
-const user = { create, findOneByUsername}
+const user = { create, findOneByUsername, update };
 export default user;

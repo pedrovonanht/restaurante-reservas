@@ -1,6 +1,7 @@
 import {
   InternalServerError,
   MethodNotAllowedError,
+  NotFoundError,
   ValidationError,
 } from "infra/error.js";
 
@@ -8,7 +9,8 @@ function onError(error, request, response) {
   if (
     error instanceof InternalServerError ||
     error instanceof ValidationError ||
-    error instanceof MethodNotAllowedError
+    error instanceof MethodNotAllowedError ||
+    error instanceof NotFoundError
   ) {
     return response.status(error.statusCode).json(error);
   }

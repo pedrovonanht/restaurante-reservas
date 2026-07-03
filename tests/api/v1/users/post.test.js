@@ -12,7 +12,7 @@ beforeAll(async () => {
 describe("POST in `api/v1/user`", () => {
   describe("Anonymouse user", () => {
     test("With valid data", async () => {
-      const response = await fetch("http://localhost:3000/api/v1/user", {
+      const response = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,26 +54,26 @@ describe("POST in `api/v1/user`", () => {
     });
 
     test("With duplicated username", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/user", {
+      const response1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "usedUsername",
+          username: "usedusername",
           password: "firstpassword",
           email: "usedUsername@gmail.com",
         }),
       });
       expect(response1.status).toBe(201);
 
-      const response2 = await fetch("http://localhost:3000/api/v1/user", {
+      const response2 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: "usedUsername",
+          username: "Usedusername",
           password: "firstpassword2",
           email: "uneusedUsername2@gmail.com",
         }),
@@ -89,7 +89,7 @@ describe("POST in `api/v1/user`", () => {
       });
     });
     test("With duplicated email", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/user", {
+      const response1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,14 +101,14 @@ describe("POST in `api/v1/user`", () => {
         }),
       });
       expect(response1.status).toBe(201);
-      const response2 = await fetch("http://localhost:3000/api/v1/user", {
+      const response2 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username: "emailduplicado2",
-          password: "emailduplicado1233",
+          password: "Emailduplicado1233",
           email: "emailduplicado@gmail.com",
         }),
       });
@@ -123,7 +123,7 @@ describe("POST in `api/v1/user`", () => {
       });
     });
     test("With undefined password", async () => {
-      const response1 = await fetch("http://localhost:3000/api/v1/user", {
+      const response1 = await fetch("http://localhost:3000/api/v1/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
