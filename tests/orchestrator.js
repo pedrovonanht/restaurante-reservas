@@ -2,6 +2,8 @@ import database from "infra/database";
 import retry from "async-retry";
 import webserver from "infra/webserver";
 import migrator from "models/migrator"
+import user from "models/user.js"
+import {faker} from "@faker-js/faker"
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -30,10 +32,18 @@ async function waitForAllServices() {
   }
 }
 
+async function createUser(userInputValues) {
+  return await user.create({
+    username: userInputValues.username || faker.internet.username(),
+    email: userInputValues.email || faker.internet.email(),
+    password: userInputValues.password || "validPassword123"
+  })
+}
 const orchestrator = {
   clearDatabase,
   waitForAllServices,
-  runPendingMigrations
+  runPendingMigrations,
+  createUser
 };
 
 export default orchestrator;
