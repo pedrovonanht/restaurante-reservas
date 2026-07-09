@@ -6,6 +6,9 @@ import {
   ValidationError,
 } from "infra/error.js";
 
+import { stringifySetCookie } from "cookie";
+import session from "models/session"
+
 function onError(error, request, response) {
   if (
     error instanceof InternalServerError ||
@@ -27,11 +30,25 @@ function onNoMatch(request, response) {
   return response.status(error.statusCode).json(error);
 }
 
+function setCookiesHeader(response, token) {
+  response.setHeader(
+    "Set-Cookie",
+    stringifySetCookie({
+      name: "session_id",
+      value: token,
+      maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
+      path: "/",
+      httpOnly: true,
+    }),
+  );
+}
+
 const controller = {
   errorHandlers: {
     onError,
     onNoMatch,
   },
+  setCookiesHeader
 };
 
 export default controller;
