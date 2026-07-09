@@ -4,6 +4,7 @@ import webserver from "infra/webserver";
 import migrator from "models/migrator"
 import user from "models/user.js"
 import {faker} from "@faker-js/faker"
+import session from "models/session";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -39,11 +40,16 @@ async function createUser(userInputValues) {
     password: userInputValues.password || "validPassword123"
   })
 }
+
+async function createSession(userId) {
+  return await session.create(userId)
+}
 const orchestrator = {
   clearDatabase,
   waitForAllServices,
   runPendingMigrations,
-  createUser
+  createUser,
+  createSession
 };
 
 export default orchestrator;
