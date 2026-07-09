@@ -43,12 +43,26 @@ function setCookiesHeader(response, token) {
   );
 }
 
+function clearCookiesHeader(response) {
+  response.setHeader(
+    "Set-Cookie",
+    stringifySetCookie({
+      name: "session_id",
+      value: "invalid",
+      maxAge: -1,
+      path: "/",
+      httpOnly: true,
+    }),
+  );
+}
+
 const controller = {
   errorHandlers: {
     onError,
     onNoMatch,
   },
-  setCookiesHeader
+  setCookiesHeader,
+  clearCookiesHeader,
 };
 
 export default controller;
