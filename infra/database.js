@@ -34,6 +34,25 @@ async function query(queryObject) {
   }
 }
 
-const database = { getNewClient, query }
+async function transaction(callback) {
+  let client;
+  try {
+    client = await getNewClient();
+    await client.query("BEGIN");
+    const result = await callback(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client?.query("ROLLBACK");
+    throw new ServiceError({
+      message: "Erro na transação do banco de dados",
+      cause: error,
+    });
+  } finally {
+    await client?.end();
+  }
+}
+
+const database = { getNewClient, query, transaction };
 
 export default database;
