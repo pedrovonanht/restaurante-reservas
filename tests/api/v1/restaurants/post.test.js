@@ -19,7 +19,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Sem Sessão",
-          slug: "restaurante-sem-sessao",
           max_covers: 30,
         }),
       });
@@ -46,7 +45,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Token Inválido",
-          slug: "restaurante-token-invalido",
           max_covers: 30,
         }),
       });
@@ -81,7 +79,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Sessão Expirada",
-          slug: "restaurante-sessao-expirada",
           max_covers: 30,
         }),
       });
@@ -111,7 +108,6 @@ describe("POST in `api/v1/restaurants`", () => {
           Cookie: `session_id=${sessionObject.token}`,
         },
         body: JSON.stringify({
-          slug: "restaurante-sem-nome",
           max_covers: 30,
         }),
       });
@@ -122,34 +118,6 @@ describe("POST in `api/v1/restaurants`", () => {
         name: "ValidationError",
         message: "O campo `name` é obrigatório.",
         action: "Tente novamente informando um `name`",
-        status_code: 400,
-      });
-    });
-
-    test("With missing `slug`", async () => {
-      const createdUser = await orchestrator.createUser({
-        username: "missingSlugRestaurant",
-      });
-      const sessionObject = await orchestrator.createSession(createdUser.id);
-
-      const response = await fetch("http://localhost:3000/api/v1/restaurants", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `session_id=${sessionObject.token}`,
-        },
-        body: JSON.stringify({
-          name: "Restaurante Sem Slug",
-          max_covers: 30,
-        }),
-      });
-
-      expect(response.status).toBe(400);
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        name: "ValidationError",
-        message: "O campo `slug` é obrigatório.",
-        action: "Tente novamente informando um `slug`",
         status_code: 400,
       });
     });
@@ -168,7 +136,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Sem Max Covers",
-          slug: "restaurante-sem-max-covers",
         }),
       });
 
@@ -198,7 +165,6 @@ describe("POST in `api/v1/restaurants`", () => {
           },
           body: JSON.stringify({
             name: "Primeiro Restaurante",
-            slug: "slug-repetido",
             max_covers: 30,
           }),
         },
@@ -215,7 +181,6 @@ describe("POST in `api/v1/restaurants`", () => {
           },
           body: JSON.stringify({
             name: "Primeiro Restaurante",
-            slug: "slug-repetido",
             max_covers: 50,
           }),
         },
@@ -225,8 +190,8 @@ describe("POST in `api/v1/restaurants`", () => {
       const responseBody = await response2.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O slug informado já está sendo utilizado.",
-        action: "Utilize outro slug para realizar essa operação!",
+        message: "O nome informado já está sendo utilizado.",
+        action: "Utilize outro nome para realizar essa operação!",
         status_code: 400,
       });
     });
@@ -245,7 +210,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Válido",
-          slug: "restaurante-valido",
           max_covers: 40,
         }),
       });

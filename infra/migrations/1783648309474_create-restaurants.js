@@ -10,6 +10,7 @@ exports.up = (pgm) => {
     name: {
       type: "varchar",
       notNull: true,
+      unique: true,
     },
     slug: {
       type: "varchar",
