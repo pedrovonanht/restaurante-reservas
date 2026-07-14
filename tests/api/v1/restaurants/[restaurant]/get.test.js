@@ -11,20 +11,22 @@ describe("POST in `api/v1/restaurants/[restaurant]`", () => {
   describe("Anonymous user", () => {
     test("With exact case match", async () => {
       const createdUser = await orchestrator.createUser({
-       username: "restaurant-exact" 
-      })
+        username: "restaurant-exact",
+      });
 
-      const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
-        name: "Restaurante Case",
-        max_covers: 10
-      })
+      const createdRestaurant = await orchestrator.createRestaurant(
+        createdUser.id,
+        {
+          name: "Restaurante Case",
+          max_covers: 10,
+        },
+      );
 
       await orchestrator.createMembership({
         userId: createdUser.id,
         restaurantId: createdRestaurant.id,
-        role: "owner"
-      })
-
+        role: "owner",
+      });
 
       const response = await fetch(
         "http://localhost:3000/api/v1/restaurants/restaurante-case",

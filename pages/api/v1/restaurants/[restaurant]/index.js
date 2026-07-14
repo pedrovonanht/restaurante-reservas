@@ -11,13 +11,15 @@ export default router.handler(controller.errorHandlers);
 
 async function patchHandler(request, response) {
   await session.findOneValidByToken(request.cookies.session_id);
-  const restaurantSlug = request.query.restaurant
-  const values = request.body
-  const updatedRestaurant = await restaurant.update(restaurantSlug, values)
-  return response.status(200).json(updatedRestaurant)
+  const restaurantSlug = request.query.restaurant;
+  const values = request.body;
+  const updatedRestaurant = await restaurant.update(restaurantSlug, values);
+  return response.status(200).json(updatedRestaurant);
 }
 
 async function getHandler(request, response) {
-  const restaurantObject = await restaurant.findOneBySlug(request.query.restaurant)  
+  const restaurantObject = await restaurant.findOneBySlug(
+    request.query.restaurant,
+  );
   return response.status(200).json(restaurantObject);
 }

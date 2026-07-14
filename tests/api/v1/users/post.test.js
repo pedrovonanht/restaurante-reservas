@@ -49,8 +49,8 @@ describe("POST in `api/v1/user`", () => {
         userInDatabase.password,
       );
 
-      expect(correctPasswordMatch).toBe(true)
-      expect(incorrectPasswordMatch).toBe(false)
+      expect(correctPasswordMatch).toBe(true);
+      expect(incorrectPasswordMatch).toBe(false);
     });
 
     test("With duplicated username", async () => {

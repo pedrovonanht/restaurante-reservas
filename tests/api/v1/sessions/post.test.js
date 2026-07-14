@@ -1,7 +1,7 @@
-import session from "models/session.js"
+import session from "models/session.js";
 import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
-import { parseSetCookie } from 'set-cookie-parser';
+import { parseSetCookie } from "set-cookie-parser";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
@@ -12,10 +12,10 @@ beforeAll(async () => {
 describe("POST in `api/v1/sessions`", () => {
   describe("Anonymous user", () => {
     test("With correct 'email' and correct 'password'", async () => {
-      const createdUser = await orchestrator.createUser( { 
-          email: "correctUser@gmail.com",
-          password: "senha123"
-      })
+      const createdUser = await orchestrator.createUser({
+        email: "correctUser@gmail.com",
+        password: "senha123",
+      });
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -28,9 +28,9 @@ describe("POST in `api/v1/sessions`", () => {
         }),
       });
 
-      expect(response.status).toBe(201)
+      expect(response.status).toBe(201);
 
-      const responseBody = await response.json()
+      const responseBody = await response.json();
 
       expect(responseBody).toEqual({
         id: responseBody.id,
@@ -38,24 +38,24 @@ describe("POST in `api/v1/sessions`", () => {
         user_id: createdUser.id,
         expires_at: responseBody.expires_at,
         created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at
-      })
-    
+        updated_at: responseBody.updated_at,
+      });
+
       expect(uuidVersion(responseBody.id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
       expect(Date.parse(responseBody.expires_at)).not.toBeNaN();
 
-      const expiresAt = new Date(responseBody.expires_at)
-      const createdAt = new Date(responseBody.created_at)
+      const expiresAt = new Date(responseBody.expires_at);
+      const createdAt = new Date(responseBody.created_at);
 
       expiresAt.setMilliseconds(0);
       createdAt.setMilliseconds(0);
-      expect(expiresAt - createdAt).toBe(session.EXPIRATION_IN_MILLISECONDS) //constante do model sessions equivalente a 30 dias
+      expect(expiresAt - createdAt).toBe(session.EXPIRATION_IN_MILLISECONDS); //constante do model sessions equivalente a 30 dias
 
-      const parsedSetCookie =  parseSetCookie(response, {
+      const parsedSetCookie = parseSetCookie(response, {
         map: true,
-      })
+      });
 
       expect(parsedSetCookie.session_id).toEqual({
         name: "session_id",
@@ -63,13 +63,13 @@ describe("POST in `api/v1/sessions`", () => {
         maxAge: session.EXPIRATION_IN_MILLISECONDS / 1000,
         path: "/",
         httpOnly: true,
-      })
+      });
     });
     test("With correct 'password' but incorrect 'email'", async () => {
-    await orchestrator.createUser( { 
-          email: "incorrectEmail@gmail.com",
-          password: "senha123"
-    })
+      await orchestrator.createUser({
+        email: "incorrectEmail@gmail.com",
+        password: "senha123",
+      });
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -92,10 +92,10 @@ describe("POST in `api/v1/sessions`", () => {
       });
     });
     test("With correct 'email' but incorrect 'password'", async () => {
-    await orchestrator.createUser( { 
-          email: "correctEmail@gmail.com",
-          password: "senha123"
-    })
+      await orchestrator.createUser({
+        email: "correctEmail@gmail.com",
+        password: "senha123",
+      });
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",
@@ -118,7 +118,7 @@ describe("POST in `api/v1/sessions`", () => {
       });
     });
     test("With incorrect 'email' and incorrect 'password'", async () => {
-    await orchestrator.createUser({})
+      await orchestrator.createUser({});
 
       const response = await fetch("http://localhost:3000/api/v1/sessions", {
         method: "POST",

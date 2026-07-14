@@ -99,23 +99,24 @@ function slugify(text) {
 }
 
 async function update(recieviedSlug, restaurantInputValues) {
-  if (!restaurantInputValues || Object.keys(restaurantInputValues).length === 0) {
+  if (
+    !restaurantInputValues ||
+    Object.keys(restaurantInputValues).length === 0
+  ) {
     throw new ValidationError({
       message: "A requisição espera um objeto, que não foi enviado.",
       action: "Verifique o corpo da requisição.",
     });
   }
 
-
   if ("name" in restaurantInputValues) {
     await validateUniqueName(restaurantInputValues.name);
-    
+
     restaurantInputValues = {
       ...restaurantInputValues,
       slug: slugify(restaurantInputValues.name),
     };
   }
-
 
   const currentRestaurant = await findOneBySlug(recieviedSlug);
   const userWithNewValues = { ...currentRestaurant, ...restaurantInputValues };
