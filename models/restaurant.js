@@ -21,26 +21,28 @@ async function create(userId, restaurantInputValues) {
 
   const slug = slugify(restaurantInputValues.name);
 
-  const newRestaurant = await database.transaction(async (transactionClient) => {
-    const result = await transactionClient.query({
-      text: `INSERT INTO restaurants (name, slug, max_covers)
+  const newRestaurant = await database.transaction(
+    async (transactionClient) => {
+      const result = await transactionClient.query({
+        text: `INSERT INTO restaurants (name, slug, max_covers)
              VALUES ($1, $2, $3)
              RETURNING *`,
-      values: [
-        restaurantInputValues.name,
-        slug,
-        restaurantInputValues.max_covers,
-      ],
-    });
-    const createdRestaurant = result.rows[0];
+        values: [
+          restaurantInputValues.name,
+          slug,
+          restaurantInputValues.max_covers,
+        ],
+      });
+      const createdRestaurant = result.rows[0];
 
-    await membership.create(
-      { restaurantId: createdRestaurant.id, userId, role: "owner" },
-      transactionClient
-    );
+      await membership.create(
+        { restaurantId: createdRestaurant.id, userId, role: "owner" },
+        transactionClient,
+      );
 
-    return createdRestaurant;
-  });
+      return createdRestaurant;
+    },
+  );
 
   return newRestaurant;
 }
@@ -59,7 +61,7 @@ async function validateUniqueName(name) {
   }
 }
 
-async function findOneBySlug (slug) {
+async function findOneBySlug(slug) {
   return await runSelectQuery(slug);
 
   async function runSelectQuery(slug) {
@@ -71,15 +73,17 @@ async function findOneBySlug (slug) {
       restaurants
       WHERE
       slug=$1
-      `, values: [slug] })
+      `,
+      values: [slug],
+    });
 
-      if (result.rowCount === 0) {
-        throw new NotFoundError({
-          message: "O restaurante informado não foi encontrado no sistema.",
-          action: "Verifique o `slug` informado."
-        })
-      }
-      return result.rows[0];
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O `slug` informado não foi encontrado no sistema.",
+        action: "Verifique o `slug` informado.",
+      });
+    }
+    return result.rows[0];
   }
 }
 
@@ -94,5 +98,46 @@ function slugify(text) {
     .replace(/^-+|-+$/g, "");
 }
 
-const restaurant = { create, findOneBySlug };
+async function update(recieviedSlug, restaurantInputValues) {
+  if (!restaurantInputValues || Object.keys(restaurantInputValues).length === 0) {
+    throw new ValidationError({
+      message: "A requisição espera um objeto, que não foi enviado.",
+      action: "Verifique o corpo da requisição.",
+    });
+  }
+
+
+  if ("name" in restaurantInputValues) {
+    await validateUniqueName(restaurantInputValues.name);
+    
+    restaurantInputValues = {
+      ...restaurantInputValues,
+      slug: slugify(restaurantInputValues.name),
+    };
+  }
+
+
+  const currentRestaurant = await findOneBySlug(recieviedSlug);
+  const userWithNewValues = { ...currentRestaurant, ...restaurantInputValues };
+
+  return await runUpdateQuery(userWithNewValues);
+
+  async function runUpdateQuery(userWithNewValues) {
+    const result = await database.query({
+      text: `UPDATE restaurants
+             SET name=$1, max_covers=$2, slug=$3, updated_at=now()
+             WHERE id=$4
+             RETURNING *`,
+      values: [
+        userWithNewValues.name,
+        userWithNewValues.max_covers,
+        userWithNewValues.slug,
+        userWithNewValues.id,
+      ],
+    });
+    return result.rows[0];
+  }
+}
+
+const restaurant = { create, findOneBySlug, update };
 export default restaurant;
