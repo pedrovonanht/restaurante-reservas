@@ -22,7 +22,6 @@ describe("GET in `api/v1/user`", () => {
         action: "Verifique se o usuário está logado.",
         status_code: 401,
       });
-
     });
   });
   describe("Default user", () => {

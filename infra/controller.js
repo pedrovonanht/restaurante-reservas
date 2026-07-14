@@ -7,7 +7,7 @@ import {
 } from "infra/error.js";
 
 import { stringifySetCookie } from "cookie";
-import session from "models/session"
+import session from "models/session";
 
 function onError(error, request, response) {
   if (

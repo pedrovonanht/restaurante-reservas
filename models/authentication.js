@@ -9,10 +9,7 @@ async function getAuthenticatedUser(providedEmail, providedPassword) {
 
     return storedUser;
   } catch (error) {
-    if (
-      error instanceof NotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
+    if (error instanceof NotFoundError || error instanceof UnauthorizedError) {
       throw new UnauthorizedError({
         message: "Dados de autenticação não conferem.",
         action: "Verifique os dados enviados.",

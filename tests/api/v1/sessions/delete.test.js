@@ -93,7 +93,7 @@ describe("DELETE /api/v1/sessions", () => {
 
       const responseBody = await response.json();
 
-           expect(responseBody).toEqual({
+      expect(responseBody).toEqual({
         name: "UnauthorizedError",
         message: "Sessão inválida.",
         action: "Verifique se o usuário está logado.",
