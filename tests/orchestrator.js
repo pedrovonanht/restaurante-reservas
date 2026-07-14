@@ -1,16 +1,18 @@
 import database from "infra/database";
 import retry from "async-retry";
 import webserver from "infra/webserver";
-import migrator from "models/migrator"
-import user from "models/user.js"
-import {faker} from "@faker-js/faker"
+import migrator from "models/migrator";
+import user from "models/user.js";
+import { faker } from "@faker-js/faker";
 import session from "models/session";
+import restaurant from "models/restaurant";
+import membership from "models/membership";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
 }
 
-async function runPendingMigrations () {
+async function runPendingMigrations() {
   await migrator.runPendingMigrations();
 }
 
@@ -37,19 +39,36 @@ async function createUser(userInputValues) {
   return await user.create({
     username: userInputValues.username || faker.internet.username(),
     email: userInputValues.email || faker.internet.email(),
-    password: userInputValues.password || "validPassword123"
-  })
+    password: userInputValues.password || "validPassword123",
+  });
+}
+
+async function createRestaurant(userId, restaurantInputValues) {
+  return await restaurant.create(userId, {
+    name: restaurantInputValues.name,
+    max_covers: restaurantInputValues.max_covers,
+  });
+}
+
+async function createMembership({userId, restaurantId, role}) {
+  return await membership.create({
+    userId: userId,
+    restaurantId: restaurantId,
+    role,
+  });
 }
 
 async function createSession(userId) {
-  return await session.create(userId)
+  return await session.create(userId);
 }
 const orchestrator = {
   clearDatabase,
   waitForAllServices,
   runPendingMigrations,
   createUser,
-  createSession
+  createSession,
+  createMembership,
+  createRestaurant
 };
 
 export default orchestrator;

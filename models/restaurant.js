@@ -1,5 +1,5 @@
 import database from "infra/database.js";
-import { ValidationError } from "infra/error.js";
+import { NotFoundError, ValidationError } from "infra/error.js";
 import membership from "models/membership.js";
 
 async function create(userId, restaurantInputValues) {
@@ -59,6 +59,30 @@ async function validateUniqueName(name) {
   }
 }
 
+async function findOneBySlug (slug) {
+  return await runSelectQuery(slug);
+
+  async function runSelectQuery(slug) {
+    const result = await database.query({
+      text: `
+      SELECT
+      *
+      FROM
+      restaurants
+      WHERE
+      slug=$1
+      `, values: [slug] })
+
+      if (result.rowCount === 0) {
+        throw new NotFoundError({
+          message: "O restaurante informado não foi encontrado no sistema.",
+          action: "Verifique o `slug` informado."
+        })
+      }
+      return result.rows[0];
+  }
+}
+
 function slugify(text) {
   return text
     .toString()
@@ -70,5 +94,5 @@ function slugify(text) {
     .replace(/^-+|-+$/g, "");
 }
 
-const restaurant = { create };
+const restaurant = { create, findOneBySlug };
 export default restaurant;
