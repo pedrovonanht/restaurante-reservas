@@ -8,7 +8,7 @@ beforeAll(async () => {
 });
 
 describe("POST in `api/v1/restaurants/[restaurant]`", () => {
-  describe("Anonymouse user", () => {
+  describe("Anonymous user", () => {
     test("With exact case match", async () => {
       const createdUser = await orchestrator.createUser({
        username: "restaurant-exact" 
@@ -54,7 +54,7 @@ describe("POST in `api/v1/restaurants/[restaurant]`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "NotFoundError",
-        message: "O restaurante informado não foi encontrado no sistema.",
+        message: "O `slug` informado não foi encontrado no sistema.",
         action: "Verifique o `slug` informado.",
         status_code: 404,
       });

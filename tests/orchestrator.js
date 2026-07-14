@@ -37,9 +37,9 @@ async function waitForAllServices() {
 
 async function createUser(userInputValues) {
   return await user.create({
-    username: userInputValues.username || faker.internet.username(),
-    email: userInputValues.email || faker.internet.email(),
-    password: userInputValues.password || "validPassword123",
+    username: userInputValues?.username || faker.internet.username(),
+    email: userInputValues?.email || faker.internet.email(),
+    password: userInputValues?.password || "validPassword123",
   });
 }
 
@@ -50,7 +50,7 @@ async function createRestaurant(userId, restaurantInputValues) {
   });
 }
 
-async function createMembership({userId, restaurantId, role}) {
+async function createMembership({ userId, restaurantId, role }) {
   return await membership.create({
     userId: userId,
     restaurantId: restaurantId,
@@ -68,7 +68,7 @@ const orchestrator = {
   createUser,
   createSession,
   createMembership,
-  createRestaurant
+  createRestaurant,
 };
 
 export default orchestrator;

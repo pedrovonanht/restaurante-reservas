@@ -7,7 +7,7 @@ beforeAll(async () => {
   await orchestrator.runPendingMigrations();
 });
 
-describe("POST in `api/v1/user`", () => {
+describe("POST in `api/v1/users/[username]`", () => {
   describe("Anonymouse user", () => {
     test("With exact case match", async () => {
       await fetch("http://localhost:3000/api/v1/users", {
