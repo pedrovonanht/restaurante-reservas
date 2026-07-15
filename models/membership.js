@@ -29,7 +29,7 @@ async function findOneByRestaurantIdAndUserId(restaurantId, userId) {
 
   if (result.rowCount === 0) {
     throw new NotFoundError({
-      message: "A associação informada não foi encontrada no sistema.",
+      message: "A membership informada não foi encontrada no sistema.",
       action: "Verifique o restaurante e o usuário informados.",
     });
   }

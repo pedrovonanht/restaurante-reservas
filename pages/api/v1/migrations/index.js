@@ -1,10 +1,12 @@
 import controller from "infra/controller";
 import migrator from "models/migrator.js";
+import authorization from "models/authorization.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
-router.get(getHandler);
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.get(authorization.canRequest("read:migrations"), getHandler);
+router.post(authorization.canRequest("create:migrations"), postHandler);
 
 export default router.handler(controller.errorHandlers);
 

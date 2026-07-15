@@ -30,7 +30,6 @@ describe("POST in `api/v1/user`", () => {
         id: responseBody.id,
         username: "validUsername",
         email: "validEmail@gmail.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

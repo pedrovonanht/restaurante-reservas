@@ -114,6 +114,130 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
   });
 
   describe("Authenticated User", () => {
+    test("Without membership", async () => {
+      const ownerUser = await orchestrator.createUser();
+      await orchestrator.createRestaurant(ownerUser.id, {
+        name: "Sem Membership",
+        max_covers: 24,
+      });
+
+      const otherUser = await orchestrator.createUser();
+      const sessionObject = await orchestrator.createSession(otherUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/sem-membership",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            max_covers: 30,
+          }),
+        },
+      );
+
+      expect(response.status).toBe(403);
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não pode executar esta operação.",
+        action: `Verifique se este usuário possui uma assinatura válida.`,
+        status_code: 403,
+      });
+    });
+
+    test("With membership in another restaurant", async () => {
+      const ownerUser = await orchestrator.createUser();
+      await orchestrator.createRestaurant(ownerUser.id, {
+        name: "Alvo Membership Alheio",
+        max_covers: 24,
+      });
+
+      const otherOwnerUser = await orchestrator.createUser();
+      const otherRestaurant = await orchestrator.createRestaurant(
+        otherOwnerUser.id,
+        {
+          name: "Restaurante Do Outro Dono Patch",
+          max_covers: 24,
+        },
+      );
+      await orchestrator.createMembership({
+        userId: otherOwnerUser.id,
+        restaurantId: otherRestaurant.id,
+        role: "owner",
+      });
+
+      const sessionObject = await orchestrator.createSession(ownerUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/restaurante-do-outro-dono-patch",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            max_covers: 30,
+          }),
+        },
+      );
+
+      expect(response.status).toBe(403);
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não pode executar esta operação.",
+        action: `Verifique se este usuário possui uma assinatura válida.`,
+        status_code: 403,
+      });
+    });
+
+    test("With staff Membership", async () => {
+      const ownerUser = await orchestrator.createUser();
+      const createdRestaurant = await orchestrator.createRestaurant(
+        ownerUser.id,
+        {
+          name: "Restaurante Staff Patch",
+          max_covers: 24,
+        },
+      );
+
+      const staffUser = await orchestrator.createUser();
+      await orchestrator.createMembership({
+        userId: staffUser.id,
+        restaurantId: createdRestaurant.id,
+        role: "staff",
+      });
+
+      const sessionObject = await orchestrator.createSession(staffUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/restaurante-staff-patch",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            max_covers: 30,
+          }),
+        },
+      );
+
+      expect(response.status).toBe(403);
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        name: "ForbiddenError",
+        message: "Usuário não pode executar esta operação.",
+        action: `Verifique se este usuário possui a feature "update:restaurant".`,
+        status_code: 403,
+      });
+    });
+
     test("With nonexistent restaurant", async () => {
       const createdUser = await orchestrator.createUser();
       const sessionObject = await orchestrator.createSession(createdUser.id);

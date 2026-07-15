@@ -61,6 +61,19 @@ async function createMembership({ userId, restaurantId, role }) {
 async function createSession(userId) {
   return await session.create(userId);
 }
+
+async function promoteUserToAdmin(userId) {
+  const result = await database.query({
+    text: `UPDATE users
+           SET is_admin = true, updated_at = now()
+           WHERE id = $1
+           RETURNING *`,
+    values: [userId],
+  });
+
+  return result.rows[0];
+}
+
 const orchestrator = {
   clearDatabase,
   waitForAllServices,
@@ -69,6 +82,7 @@ const orchestrator = {
   createSession,
   createMembership,
   createRestaurant,
+  promoteUserToAdmin,
 };
 
 export default orchestrator;
