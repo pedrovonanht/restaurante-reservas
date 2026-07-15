@@ -1,13 +1,12 @@
 import controller from "infra/controller";
 import authentication from "models/authentication.js";
-import authorization from "models/authorization.js";
 import session from "models/session.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
 router.post(postHandler);
-router.delete(authorization.canRequest(), deleteHandler);
+router.delete(controller.canRequest(), deleteHandler);
 
 export default router.handler(controller.errorHandlers);
 

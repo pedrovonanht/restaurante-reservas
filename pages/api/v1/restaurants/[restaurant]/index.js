@@ -6,8 +6,8 @@ import { createRouter } from "next-connect";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
-router.get(authorization.canRequest(), getHandler);
-router.patch(authorization.canRequest(), patchHandler);
+router.get(controller.canRequest(), getHandler);
+router.patch(controller.canRequest(), patchHandler);
 
 export default router.handler(controller.errorHandlers);
 

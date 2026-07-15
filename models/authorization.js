@@ -1,7 +1,6 @@
 import {
   ForbiddenError,
   NotFoundError,
-  UnauthorizedError,
 } from "infra/error.js";
 import membership from "models/membership.js";
 
@@ -28,27 +27,6 @@ function can(membershipObject, permission) {
   return rolePermissions.includes(permission);
 }
 
-function canRequest(feature) {
-  return function (request, response, next) {
-    const requestingUser = request.context?.user;
-
-    if (!requestingUser) {
-      throw new UnauthorizedError({
-        message: "Sessão inválida.",
-        action: "Verifique se o usuário está logado.",
-      });
-    }
-
-    if (feature && !getUserFeatures(requestingUser).includes(feature)) {
-      throw new ForbiddenError({
-        message: "Usuário não pode executar esta operação.",
-        action: `Verifique se este usuário possui a feature "${feature}".`,
-      });
-    }
-
-    return next();
-  };
-}
 
 async function requireMembership(user, restaurantId) {
   try {
@@ -99,7 +77,6 @@ function filterOutput(feature, output) {
 
 const authorization = {
   can,
-  canRequest,
   requireMembership,
   filterOutput,
   getUserFeatures,
