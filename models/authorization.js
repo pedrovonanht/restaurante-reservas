@@ -1,15 +1,9 @@
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "infra/error.js";
-import membership from "models/membership.js";
-
 const ROLE_PERMISSIONS = {
   owner: ["read:restaurant", "update:restaurant"],
   staff: ["read:restaurant"],
 };
 
-const BASE_FEATURES = ["create:restaurant"];
+const BASE_FEATURES = [];
 const ADMIN_FEATURES = ["read:migrations", "create:migrations"];
 
 function getUserFeatures(user) {
@@ -23,29 +17,10 @@ function getUserFeatures(user) {
 }
 
 function can(membershipObject, permission) {
-  const rolePermissions = ROLE_PERMISSIONS[membershipObject?.role] ?? [];
-  return rolePermissions.includes(permission);
+    const rolePermissions = ROLE_PERMISSIONS[membershipObject?.role] ?? [];
+    return rolePermissions.includes(permission);
 }
 
-
-async function requireMembership(user, restaurantId) {
-  try {
-    return await membership.findOneByRestaurantIdAndUserId(
-      restaurantId,
-      user.id,
-    );
-  } catch (error) {
-    if (error instanceof NotFoundError) {
-      throw new ForbiddenError({
-        message: "Usuário não pode executar esta operação.",
-        action: "Verifique se este usuário possui uma assinatura válida.",
-        cause: error,
-      });
-    }
-
-    throw error;
-  }
-}
 
 function filterOutput(feature, output) {
   let filteredOutputValues = {};
@@ -77,7 +52,6 @@ function filterOutput(feature, output) {
 
 const authorization = {
   can,
-  requireMembership,
   filterOutput,
   getUserFeatures,
 };

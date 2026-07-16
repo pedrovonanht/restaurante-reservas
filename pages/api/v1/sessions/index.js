@@ -6,7 +6,7 @@ import { createRouter } from "next-connect";
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
 router.post(postHandler);
-router.delete(controller.canRequest(), deleteHandler);
+router.delete(controller.canUserRequest(), deleteHandler);
 
 export default router.handler(controller.errorHandlers);
 

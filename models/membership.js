@@ -1,5 +1,4 @@
 import database from "infra/database.js";
-import { NotFoundError } from "infra/error.js";
 
 async function create({ restaurantId, userId, role }, transactionClient) {
   const queryRunner = transactionClient ?? database;
@@ -26,13 +25,6 @@ async function findOneByRestaurantIdAndUserId(restaurantId, userId) {
     1`,
     values: [restaurantId, userId],
   });
-
-  if (result.rowCount === 0) {
-    throw new NotFoundError({
-      message: "A membership informada não foi encontrada no sistema.",
-      action: "Verifique o restaurante e o usuário informados.",
-    });
-  }
 
   return result.rows[0];
 }

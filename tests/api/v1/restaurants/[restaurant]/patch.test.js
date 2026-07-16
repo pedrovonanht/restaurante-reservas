@@ -143,7 +143,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Usuário não pode executar esta operação.",
-        action: `Verifique se este usuário possui uma assinatura válida.`,
+        action: `Verifique se este usuário possui a feature "update:restaurant" para esse restaurante.`,
         status_code: 403,
       });
     });
@@ -190,7 +190,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Usuário não pode executar esta operação.",
-        action: `Verifique se este usuário possui uma assinatura válida.`,
+        action: `Verifique se este usuário possui a feature "update:restaurant" para esse restaurante.`,
         status_code: 403,
       });
     });
@@ -233,7 +233,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       expect(responseBody).toEqual({
         name: "ForbiddenError",
         message: "Usuário não pode executar esta operação.",
-        action: `Verifique se este usuário possui a feature "update:restaurant".`,
+        action: `Verifique se este usuário possui a feature "update:restaurant" para esse restaurante.`,
         status_code: 403,
       });
     });
@@ -272,10 +272,13 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
         name: "Duplicado 1",
         max_covers: 24,
       });
-      await orchestrator.createRestaurant(createdUser.id, {
-        name: "Duplicado 12",
-        max_covers: 24,
-      });
+      await orchestrator.createRestaurant(
+        createdUser.id,
+        {
+          name: "Duplicado 12",
+          max_covers: 24,
+        },
+      );
 
       const response = await fetch(
         "http://localhost:3000/api/v1/restaurants/duplicado-12",
@@ -304,10 +307,13 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
     test("With no object on request", async () => {
       const createdUser = await orchestrator.createUser();
       const sessionObject = await orchestrator.createSession(createdUser.id);
-      await orchestrator.createRestaurant(createdUser.id, {
-        name: "No Object",
-        max_covers: 24,
-      });
+      await orchestrator.createRestaurant(
+        createdUser.id,
+        {
+          name: "No Object",
+          max_covers: 24,
+        },
+      );
       const response = await fetch(
         "http://localhost:3000/api/v1/restaurants/no-object",
         {

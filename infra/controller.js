@@ -82,7 +82,7 @@ async function injectAnonymousOrUser(request, response, next) {
   return next();
 }
 
-function canRequest(feature) {
+function canUserRequest(feature) {
   return function (request, response, next) {
     const requestingUser = request.context?.user;
 
@@ -113,7 +113,7 @@ const controller = {
   setCookiesHeader,
   clearCookiesHeader,
   injectAnonymousOrUser,
-  canRequest
+  canUserRequest
 };
 
 

@@ -43,7 +43,7 @@ async function createUser(userInputValues) {
   });
 }
 
-async function createRestaurant(userId, restaurantInputValues) {
+async function createRestaurant(userId, restaurantInputValues) { //método cria membership do user como 'owner' junto
   return await restaurant.create(userId, {
     name: restaurantInputValues.name,
     max_covers: restaurantInputValues.max_covers,
