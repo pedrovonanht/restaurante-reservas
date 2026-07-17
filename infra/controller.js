@@ -1,4 +1,5 @@
 import {
+  ForbiddenError,
   InternalServerError,
   MethodNotAllowedError,
   NotFoundError,
@@ -8,6 +9,8 @@ import {
 
 import { stringifySetCookie } from "cookie";
 import session from "models/session";
+import user from "models/user"
+import authorization from "models/authorization";
 
 function onError(error, request, response) {
   if (
@@ -15,7 +18,8 @@ function onError(error, request, response) {
     error instanceof ValidationError ||
     error instanceof MethodNotAllowedError ||
     error instanceof NotFoundError ||
-    error instanceof UnauthorizedError
+    error instanceof UnauthorizedError ||
+    error instanceof ForbiddenError
   ) {
     return response.status(error.statusCode).json(error);
   }
@@ -56,6 +60,51 @@ function clearCookiesHeader(response) {
   );
 }
 
+async function injectAnonymousOrUser(request, response, next) {
+  if (request.cookies?.session_id) {
+    const sessionObject = await session.findOneValidByToken(
+      request.cookies.session_id,
+    );
+    const userObject = await user.findOneById(sessionObject.user_id);
+
+    request.context = {
+      ...request.context,
+      user: userObject,
+      session: sessionObject,
+    };
+    return next();
+  }
+
+  request.context = {
+    ...request.context,
+    user: null,
+  };
+  return next();
+}
+
+function canUserRequest(feature) {
+  return function (request, response, next) {
+    const requestingUser = request.context?.user;
+
+    if (!requestingUser) {
+      throw new UnauthorizedError({
+        message: "Sessão inválida.",
+        action: "Verifique se o usuário está logado.",
+      });
+    }
+
+    if (feature && !authorization.getUserFeatures(requestingUser).includes(feature)) {
+      throw new ForbiddenError({
+        message: "Usuário não pode executar esta operação.",
+        action: `Verifique se este usuário possui a feature "${feature}".`,
+      });
+    }
+
+    return next();
+  };
+}
+
+
 const controller = {
   errorHandlers: {
     onError,
@@ -63,6 +112,10 @@ const controller = {
   },
   setCookiesHeader,
   clearCookiesHeader,
+  injectAnonymousOrUser,
+  canUserRequest
 };
+
+
 
 export default controller;

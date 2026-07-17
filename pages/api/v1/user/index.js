@@ -1,20 +1,20 @@
 import controller from "infra/controller";
 import session from "models/session";
+import authorization from "models/authorization.js";
 import { createRouter } from "next-connect";
-import user from "models/user";
 
 const router = createRouter();
-router.get(getHandler);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canUserRequest(), getHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function getHandler(request, response) {
-  const sessionObject = await session.findOneValidByToken(
-    request.cookies.session_id,
-  );
-  const foundUser = await user.findOneById(sessionObject.user_id);
+  const requestingUser = request.context.user;
+  const sessionObject = request.context.session;
   await session.renew(sessionObject.id);
 
   controller.setCookiesHeader(response, sessionObject.token);
-  return response.status(200).json(foundUser);
+  const filteredUser = authorization.filterOutput("read:user", requestingUser);
+  return response.status(200).json(filteredUser);
 }

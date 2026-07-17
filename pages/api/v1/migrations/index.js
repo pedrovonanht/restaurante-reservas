@@ -3,8 +3,9 @@ import migrator from "models/migrator.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
-router.get(getHandler);
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.get(controller.canUserRequest("read:migrations"), getHandler);
+router.post(controller.canUserRequest("create:migrations"), postHandler);
 
 export default router.handler(controller.errorHandlers);
 

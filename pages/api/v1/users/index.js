@@ -1,5 +1,6 @@
 import controller from "infra/controller";
 import user from "models/user.js";
+import authorization from "models/authorization.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
@@ -9,5 +10,6 @@ export default router.handler(controller.errorHandlers);
 
 async function postHandler(request, response) {
   const newUser = await user.create(request.body);
-  return response.status(201).json(newUser);
+  const filteredUser = authorization.filterOutput( "read:user", newUser);
+  return response.status(201).json(filteredUser);
 }

@@ -1,20 +1,23 @@
 import controller from "infra/controller";
 import restaurant from "models/restaurant.js";
-import session from "models/session.js";
+import authorization from "models/authorization.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
-router.post(postHandler);
+router.use(controller.injectAnonymousOrUser);
+router.post(controller.canUserRequest(), postHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function postHandler(request, response) {
-  const sessionObject = await session.findOneValidByToken(
-    request.cookies.session_id,
-  );
+  const requestingUser = request.context.user;
   const newRestaurant = await restaurant.create(
-    sessionObject.user_id,
+    requestingUser.id,
     request.body,
   );
-  return response.status(201).json(newRestaurant);
+  const filteredRestaurant = authorization.filterOutput(
+    "read:restaurant",
+    newRestaurant,
+  );
+  return response.status(201).json(filteredRestaurant);
 }

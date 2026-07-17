@@ -32,7 +32,6 @@ describe("POST in `api/v1/users/[username]`", () => {
         id: responseBody.id,
         username: "searchValidUsername",
         email: "searchValidEmail@gmail.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -64,7 +63,6 @@ describe("POST in `api/v1/users/[username]`", () => {
         id: responseBody.id,
         username: "CasemissmatchUsername",
         email: "CasemissmatchEmail@gmail.com",
-        password: responseBody.password,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

@@ -43,7 +43,7 @@ async function createUser(userInputValues) {
   });
 }
 
-async function createRestaurant(userId, restaurantInputValues) {
+async function createRestaurant(userId, restaurantInputValues) { //método cria membership do user como 'owner' junto
   return await restaurant.create(userId, {
     name: restaurantInputValues.name,
     max_covers: restaurantInputValues.max_covers,
@@ -61,6 +61,19 @@ async function createMembership({ userId, restaurantId, role }) {
 async function createSession(userId) {
   return await session.create(userId);
 }
+
+async function promoteUserToAdmin(userId) {
+  const result = await database.query({
+    text: `UPDATE users
+           SET is_admin = true, updated_at = now()
+           WHERE id = $1
+           RETURNING *`,
+    values: [userId],
+  });
+
+  return result.rows[0];
+}
+
 const orchestrator = {
   clearDatabase,
   waitForAllServices,
@@ -69,6 +82,7 @@ const orchestrator = {
   createSession,
   createMembership,
   createRestaurant,
+  promoteUserToAdmin,
 };
 
 export default orchestrator;

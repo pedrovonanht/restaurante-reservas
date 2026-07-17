@@ -4,15 +4,14 @@ import session from "models/session.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
+router.use(controller.injectAnonymousOrUser);
 router.post(postHandler);
-router.delete(deleteHandler);
+router.delete(controller.canUserRequest(), deleteHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function deleteHandler(request, response) {
-  const sessionObject = await session.findOneValidByToken(
-    request.cookies.session_id,
-  );
+  const sessionObject = request.context.session;
   const expiredSession = await session.expireById(sessionObject.id);
   controller.clearCookiesHeader(response);
   return response.status(200).json(expiredSession);
