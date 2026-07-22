@@ -79,7 +79,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
   });
 
   describe("Authenticated user", () => {
-    test("Without membership, receives the public shape and not a 404", async () => {
+    test("Without membership", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
         ownerUser.id,
@@ -125,7 +125,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
       ]);
     });
 
-    test("With staff membership, receives the full shape including inactive events", async () => {
+    test("With staff membership", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
         ownerUser.id,
@@ -201,7 +201,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
       ]);
     });
 
-    test("With owner membership, receives the full shape including inactive events", async () => {
+    test("With owner membership", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
         ownerUser.id,
