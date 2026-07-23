@@ -9,6 +9,7 @@ import restaurant from "models/restaurant";
 import membership from "models/membership";
 import event from "models/event";
 import eventPreset from "models/event-preset";
+import reservation from "models/reservation";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -78,6 +79,18 @@ async function createEventPreset(restaurantId, presetInputValues) {
   return  await eventPreset.create(restaurantId, presetInputValues)
 }
 
+async function createReserve({ restaurantId, eventId, partySize, guestName, guestPhone }) {
+  const events = await event.findAllByRestaurantId(restaurantId);
+  const targetEvent = events.find((item) => item.id === eventId);
+
+  return await reservation.create(restaurantId, {
+    reservation_date: targetEvent.event_date,
+    party_size: partySize,
+    guest_name: guestName,
+    guest_phone: guestPhone,
+  });
+}
+
 async function promoteUserToAdmin(userId) {
   const result = await database.query({
     text: `UPDATE users
@@ -100,6 +113,7 @@ const orchestrator = {
   createRestaurant,
   createEvent,
   createEventPreset,
+  createReserve,
   promoteUserToAdmin,
 };
 

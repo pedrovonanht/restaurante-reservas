@@ -98,8 +98,35 @@ async function validateSlots (eventId, restaurantId, requestingPartySize) {
   }
 }
 
+async function findOneByRestaurantIdAndToken(restaurantId, token) {
+  const result = await database.query({
+    text: `SELECT * FROM reservations WHERE restaurant_id=$1 AND public_token=$2 LIMIT 1`,
+    values: [restaurantId, token],
+  });
+
+  if (result.rowCount === 0) {
+    throw new NotFoundError({
+      message: "Reserva não encontrada no sistema.",
+      action: "Verifique a url e tente novamente.",
+    });
+  }
+
+  return formatPublicReservation(result.rows[0]);
+}
+
+function formatPublicReservation(row) {
+  return {
+    id: row.id,
+    party_size: row.party_size,
+    guest_name: row.guest_name,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
 const reservation = {
-    create
+    create,
+    findOneByRestaurantIdAndToken
 }
 
 export default reservation;
