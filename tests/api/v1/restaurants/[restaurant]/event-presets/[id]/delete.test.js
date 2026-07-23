@@ -22,6 +22,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
 
@@ -58,6 +60,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
 
@@ -98,6 +102,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);
@@ -139,6 +145,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
 
@@ -179,6 +187,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
 
@@ -284,6 +294,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         otherRestaurant.id,
         {
           name: "Noite de Sushi",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
 
@@ -320,6 +332,8 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 25
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);

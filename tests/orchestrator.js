@@ -8,6 +8,7 @@ import session from "models/session";
 import restaurant from "models/restaurant";
 import membership from "models/membership";
 import event from "models/event";
+import eventPreset from "models/event-preset";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -74,23 +75,7 @@ async function createEvent(restaurantId, eventInputValues) {
 }
 
 async function createEventPreset(restaurantId, presetInputValues) {
-  const result = await database.query({
-    text: `INSERT INTO event_presets (restaurant_id, name, capacity)
-           VALUES ($1, $2, $3)
-           RETURNING *`,
-    values: [
-      restaurantId,
-      presetInputValues.name,
-      presetInputValues.capacity ?? null,
-    ],
-  });
-
-  const row = result.rows[0];
-  return {
-    ...row,
-    created_at: row.created_at.toISOString(),
-    updated_at: row.updated_at.toISOString(),
-  };
+  return  await eventPreset.create(restaurantId, presetInputValues)
 }
 
 async function promoteUserToAdmin(userId) {
