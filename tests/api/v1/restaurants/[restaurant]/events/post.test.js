@@ -399,6 +399,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         {
           name: "Noite de Fondue",
           capacity: 25,
+          event_times: ["19:30", "20:30", "21:30"]
         },
       );
 

@@ -242,7 +242,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       expect(responseBody).toEqual([]);
     });
 
-    test("Only returns presets belonging to this restaurant", async () => {
+    test("With valid data and credentials", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
         ownerUser.id,
@@ -256,6 +256,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         {
           name: "Noite de Fondue",
           capacity: 25,
+          event_times: ["19:30", "20:30", "21:30"]
         },
       );
 
@@ -270,6 +271,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       await orchestrator.createEventPreset(otherRestaurant.id, {
         name: "Noite de Sushi",
         capacity: 15,
+        event_times: ["19:30", "20:30", "21:30"]
       });
 
       const sessionObject = await orchestrator.createSession(ownerUser.id);
@@ -290,8 +292,8 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
           id: createdPreset.id,
           name: "Noite de Fondue",
           capacity: 25,
-          created_at: createdPreset.created_at,
-          updated_at: createdPreset.updated_at,
+          created_at: createdPreset.created_at.toISOString(),
+          updated_at: createdPreset.updated_at.toISOString(),
         },
       ]);
     });

@@ -19,11 +19,21 @@ async function create(restaurantId, presetInputValues) {
     });
   }
 
+   if (
+    !presetInputValues?.event_times ||
+    presetInputValues.event_times.length === 0
+  ) {
+    throw new ValidationError({
+      message: "O campo `event_times` é obrigatório.",
+      action: "Tente novamente informando um `event_times`",
+    });
+  }
+
   const result = await database.query({
-    text: `INSERT INTO event_presets (restaurant_id, name, capacity)
-           VALUES ($1, $2, $3)
+    text: `INSERT INTO event_presets (restaurant_id, name, capacity, event_times)
+           VALUES ($1, $2, $3, $4)
            RETURNING *`,
-    values: [restaurantId, presetInputValues.name, presetInputValues.capacity],
+    values: [restaurantId, presetInputValues.name, presetInputValues.capacity, presetInputValues.event_times],
   });
 
   return result.rows[0];
