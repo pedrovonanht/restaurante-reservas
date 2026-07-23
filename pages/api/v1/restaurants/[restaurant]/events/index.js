@@ -1,59 +1,46 @@
 import { ForbiddenError, NotFoundError } from "infra/error.js";
 import controller from "infra/controller";
 import restaurant from "models/restaurant.js";
-import membership from "models/membership";
 import authorization from "models/authorization.js";
 import event from "models/event.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
+router.use(controller.injectNullOrMembership)
 router.get(getHandler);
 router.post(controller.canUserRequest(), postHandler);
 
 export default router.handler(controller.errorHandlers);
 
+
 async function getHandler(request, response) {
-  const requestingUser = request.context.user;
   const restaurantObject = await restaurant.findOneBySlug(
     request.query.restaurant,
   );
-
-  const membershipObject = requestingUser
-    ? await membership.findOneByRestaurantIdAndUserId(
-        restaurantObject.id,
-        requestingUser.id,
-      )
-    : null;
+  const membershipObject = request.context.membership
+        
 
   const events = await event.findAllByRestaurantId(restaurantObject.id);
-
-  if (membershipObject) {
-    const filteredEvents = events.map((eventObject) =>
-      authorization.filterOutput("read:event", eventObject),
-    );
+  
+  if (authorization.can(membershipObject, "read:event")) {
+    const filteredEvents = authorization.filterOutput("read:event", events)
+    
     return response.status(200).json(filteredEvents);
   }
 
-  const publicEvents = events
-    .filter((eventObject) => eventObject.active)
-    .map((eventObject) =>
-      authorization.filterOutput("read:event:public", eventObject),
-    );
+  const publicEvents = authorization.filterOutput("read:event:public", events)
 
+ 
   return response.status(200).json(publicEvents);
 }
 
 async function postHandler(request, response) {
-  const requestingUser = request.context.user;
   const restaurantObject = await restaurant.findOneBySlug(
     request.query.restaurant,
   );
 
-  const membershipObject = await membership.findOneByRestaurantIdAndUserId(
-    restaurantObject.id,
-    requestingUser.id,
-  );
+  const membershipObject = request.context.membership
 
   if (!membershipObject) {
     throw new NotFoundError({

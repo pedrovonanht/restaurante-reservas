@@ -11,6 +11,8 @@ import { stringifySetCookie } from "cookie";
 import session from "models/session";
 import user from "models/user"
 import authorization from "models/authorization";
+import restaurant from "models/restaurant";
+import membership from "models/membership";
 
 function onError(error, request, response) {
   if (
@@ -81,7 +83,24 @@ async function injectAnonymousOrUser(request, response, next) {
   };
   return next();
 }
+async function injectNullOrMembership(request, response, next){
+  const restaurantObject = await restaurant.findOneBySlug(
+    request.query.restaurant,
+  );
+  const requestingUser = request.context.user
+  let membershipObject = null
+  if(requestingUser) {
+    membershipObject =  await membership.findOneByRestaurantIdAndUserId(
+        restaurantObject.id,
+        requestingUser.id)
+  }
+  request.context = {
+    ...request.context,
+    membership: membershipObject
+  }
 
+  return next();
+}
 function canUserRequest(feature) {
   return function (request, response, next) {
     const requestingUser = request.context?.user;
@@ -113,6 +132,7 @@ const controller = {
   setCookiesHeader,
   clearCookiesHeader,
   injectAnonymousOrUser,
+  injectNullOrMembership,
   canUserRequest
 };
 

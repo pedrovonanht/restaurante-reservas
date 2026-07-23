@@ -15,7 +15,7 @@
     "lint:prettier:fix": "prettier --write .",
     "lint:eslint:check": "npx eslint .",
     "test": "npm run services:up && npm run service:wait:database && concurrently -n next,jest --hide next -k -s command-jest 'next dev' 'jest --runInBand'",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watchAll --runInBand --verbose",
     "commit": "cz",
     "prepare": "husky"
   },

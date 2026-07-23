@@ -3,25 +3,21 @@ import controller from "infra/controller";
 import restaurant from "models/restaurant.js";
 import authorization from "models/authorization.js";
 import { createRouter } from "next-connect";
-import membership from "models/membership";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
+router.use(controller.injectNullOrMembership);
 router.get(controller.canUserRequest(), getHandler);
 router.patch(controller.canUserRequest(), patchHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function getHandler(request, response) {
-  const requestingUser = request.context.user;
   const restaurantObject = await restaurant.findOneBySlug(
     request.query.restaurant,
   );
 
-  const membershipObject = await membership.findOneByRestaurantIdAndUserId(
-    restaurantObject.id,
-    requestingUser.id,
-  );
+  const membershipObject = request.context.membership
 
   if (
     !membershipObject ||
@@ -40,14 +36,9 @@ async function getHandler(request, response) {
 }
 
 async function patchHandler(request, response) {
-  const requestingUser = request.context.user;
   const restaurantSlug = request.query.restaurant;
-  const restaurantObject = await restaurant.findOneBySlug(restaurantSlug);
 
-  const membershipObject = await membership.findOneByRestaurantIdAndUserId(
-    restaurantObject.id,
-    requestingUser.id,
-  );
+  const membershipObject = request.context.membership
 
   if (
     !membershipObject ||

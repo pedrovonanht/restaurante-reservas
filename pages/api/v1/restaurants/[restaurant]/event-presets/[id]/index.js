@@ -1,28 +1,24 @@
 import { ForbiddenError, NotFoundError } from "infra/error.js";
 import controller from "infra/controller";
 import restaurant from "models/restaurant.js";
-import membership from "models/membership";
 import authorization from "models/authorization.js";
 import eventPreset from "models/event-preset.js";
 import { createRouter } from "next-connect";
 
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
+router.use(controller.injectNullOrMembership);
 router.patch(controller.canUserRequest(), patchHandler);
 router.delete(controller.canUserRequest(), deleteHandler);
 
 export default router.handler(controller.errorHandlers);
 
 async function authorizeEventPresetAccess(request) {
-  const requestingUser = request.context.user;
   const restaurantObject = await restaurant.findOneBySlug(
     request.query.restaurant,
   );
 
-  const membershipObject = await membership.findOneByRestaurantIdAndUserId(
-    restaurantObject.id,
-    requestingUser.id,
-  );
+  const membershipObject = request.context.membership; 
 
   if (!membershipObject) {
     throw new NotFoundError({

@@ -5,8 +5,10 @@ const ROLE_PERMISSIONS = {
     "create:event",
     "update:event",
     "manage:event-preset",
+    "read:event",
+    "read:event:public"
   ],
-  staff: ["read:restaurant"],
+  staff: ["read:restaurant", "read:event"],
 };
 
 const BASE_FEATURES = [];
@@ -51,8 +53,19 @@ function filterOutput(feature, output) {
       updated_at: output.updated_at,
     };
   }
+    
+ 
 
-  if (feature === "read:event") {
+  if (!Array.isArray(output)) {
+  if (feature === "read:event:public") {
+    filteredOutputValues = {
+      name: output.name,
+      event_date: output.event_date,
+      event_times: output.event_times,
+    };
+  }
+
+   if (feature === "read:event") {
     filteredOutputValues = {
       id: output.id,
       name: output.name,
@@ -65,14 +78,38 @@ function filterOutput(feature, output) {
       updated_at: output.updated_at,
     };
   }
-
-  if (feature === "read:event:public") {
-    filteredOutputValues = {
-      name: output.name,
-      event_date: output.event_date,
-      event_times: output.event_times,
+} else {
+  if (feature === "read:event:public"){
+    filteredOutputValues = output
+    .filter((item) => item.active)
+    .map((item) => {
+    return {
+      name: item.name,
+      event_date: item.event_date,
+      event_times: item.event_times,
     };
+
+    }
+ 
+    );
   }
+  if( feature === "read:event") {
+    filteredOutputValues = output.map((item) => {
+      return {
+      id: item.id,
+      name: item.name,
+      event_date: item.event_date,
+      event_times: item.event_times,
+      capacity: item.capacity,
+      active: item.active,
+      preset_id: item.preset_id,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    };
+    })
+  }
+  }
+
 
   if (feature === "read:event-preset") {
     filteredOutputValues = {
