@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import session from "models/session";
 import restaurant from "models/restaurant";
 import membership from "models/membership";
+import event from "models/event";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -62,6 +63,36 @@ async function createSession(userId) {
   return await session.create(userId);
 }
 
+async function createEvent(restaurantId, eventInputValues) {
+  const createdEvent = await event.create(restaurantId, eventInputValues);
+
+  return {
+    ...createdEvent,
+    created_at: createdEvent.created_at.toISOString(),
+    updated_at: createdEvent.updated_at.toISOString(),
+  };
+}
+
+async function createEventPreset(restaurantId, presetInputValues) {
+  const result = await database.query({
+    text: `INSERT INTO event_presets (restaurant_id, name, capacity)
+           VALUES ($1, $2, $3)
+           RETURNING *`,
+    values: [
+      restaurantId,
+      presetInputValues.name,
+      presetInputValues.capacity ?? null,
+    ],
+  });
+
+  const row = result.rows[0];
+  return {
+    ...row,
+    created_at: row.created_at.toISOString(),
+    updated_at: row.updated_at.toISOString(),
+  };
+}
+
 async function promoteUserToAdmin(userId) {
   const result = await database.query({
     text: `UPDATE users
@@ -82,6 +113,8 @@ const orchestrator = {
   createSession,
   createMembership,
   createRestaurant,
+  createEvent,
+  createEventPreset,
   promoteUserToAdmin,
 };
 
