@@ -184,6 +184,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           capacity: 20,
           active: true,
           preset_id: null,
+          ocupation: { reservations: 0, capacity: 20, people: 0 },
           created_at: createdEvent.created_at,
           updated_at: createdEvent.updated_at,
         },
@@ -195,6 +196,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           capacity: 20,
           active: false,
           preset_id: null,
+          ocupation: { reservations: 0, capacity: 20, people: 0 },
           created_at: createdInactiveEvent.created_at,
           updated_at: createdInactiveEvent.updated_at,
         },
@@ -254,6 +256,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           capacity: 20,
           active: true,
           preset_id: null,
+          ocupation: { reservations: 0, capacity: 20, people: 0 },
           created_at: createdEvent.created_at,
           updated_at: createdEvent.updated_at,
         },
@@ -265,8 +268,71 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           capacity: 20,
           active: false,
           preset_id: null,
+          ocupation: { reservations: 0, capacity: 20, people: 0 },
           created_at: createdInactiveEvent.created_at,
           updated_at: createdInactiveEvent.updated_at,
+        },
+      ]);
+    });
+
+    test("With owner membership and reservations (ocupation)", async () => {
+      const ownerUser = await orchestrator.createUser();
+      const createdRestaurant = await orchestrator.createRestaurant(
+        ownerUser.id,
+        {
+          name: "Events Get Owner Ocupation",
+          max_covers: 30,
+        },
+      );
+
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
+        name: "Noite de Fondue",
+        event_date: "2026-08-01",
+        event_times: ["19:30"],
+        capacity: 20,
+        active: true,
+      });
+
+      await orchestrator.createReserve({
+        restaurantId: createdRestaurant.id,
+        eventId: createdEvent.id,
+        guestName: "Pedro",
+        guestPhone: "53991840101",
+        partySize: 2,
+      });
+      await orchestrator.createReserve({
+        restaurantId: createdRestaurant.id,
+        eventId: createdEvent.id,
+        guestName: "Ana",
+        guestPhone: "53991840102",
+        partySize: 5,
+      });
+
+      const sessionObject = await orchestrator.createSession(ownerUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/events-get-owner-ocupation/events",
+        {
+          headers: {
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+      const responseBody = await response.json();
+      expect(responseBody).toEqual([
+        {
+          id: createdEvent.id,
+          name: "Noite de Fondue",
+          event_date: "2026-08-01",
+          event_times: ["19:30"],
+          capacity: 20,
+          active: true,
+          preset_id: null,
+          ocupation: { reservations: 2, capacity: 20, people: 7 },
+          created_at: createdEvent.created_at,
+          updated_at: createdEvent.updated_at,
         },
       ]);
     });
