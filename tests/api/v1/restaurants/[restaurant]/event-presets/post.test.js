@@ -295,6 +295,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         id: responseBody.id,
         name: "Noite de Fondue",
         capacity: 25,
+        event_times: ["19:30", "20:30", "21:30"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

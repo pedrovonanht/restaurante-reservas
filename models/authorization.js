@@ -117,6 +117,7 @@ function filterOutput(feature, output) {
       id: output.id,
       name: output.name,
       capacity: output.capacity,
+      event_times: output.event_times,
       created_at: output.created_at,
       updated_at: output.updated_at,
     };

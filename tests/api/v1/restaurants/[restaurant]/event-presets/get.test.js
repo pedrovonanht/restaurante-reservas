@@ -292,6 +292,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
           id: createdPreset.id,
           name: "Noite de Fondue",
           capacity: 25,
+          event_times: ["19:30", "20:30", "21:30"],
           created_at: createdPreset.created_at.toISOString(),
           updated_at: createdPreset.updated_at.toISOString(),
         },

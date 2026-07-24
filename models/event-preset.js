@@ -36,7 +36,7 @@ async function create(restaurantId, presetInputValues) {
     values: [restaurantId, presetInputValues.name, presetInputValues.capacity, presetInputValues.event_times],
   });
 
-  return result.rows[0];
+  return formatRow(result.rows[0]);
 }
 
 async function findAllByRestaurantId(restaurantId) {
@@ -45,7 +45,7 @@ async function findAllByRestaurantId(restaurantId) {
     values: [restaurantId],
   });
 
-  return result.rows;
+  return result.rows.map(formatRow)
 }
 
 async function findOneByIdAndRestaurantId(id, restaurantId) {
@@ -54,7 +54,10 @@ async function findOneByIdAndRestaurantId(id, restaurantId) {
     values: [id, restaurantId],
   });
 
-  return result.rows[0];
+  if (result.rows.length > 0) {
+  return formatRow(result.rows[0]);
+  }
+  return result.rows[0]
 }
 
 async function update(restaurantId, id, presetInputValues) {
@@ -78,19 +81,27 @@ async function update(restaurantId, id, presetInputValues) {
 
   const result = await database.query({
     text: `UPDATE event_presets
-           SET name=$1, capacity=$2, updated_at=now()
-           WHERE id=$3
+           SET name=$1, capacity=$2, event_times=$3, updated_at=now()
+           WHERE id=$4
            RETURNING *`,
     values: [
       presetWithNewValues.name,
       presetWithNewValues.capacity,
+      presetWithNewValues.event_times,
       presetWithNewValues.id,
     ],
   });
 
-  return result.rows[0];
+
+  return formatRow(result.rows[0]);
 }
 
+  function formatRow(row) {
+    return {
+      ...row,
+      event_times: row.event_times.map((time) => time.slice(0,5))
+    }
+  }
 async function remove(restaurantId, id) {
   const currentPreset = await findOneByIdAndRestaurantId(id, restaurantId);
 

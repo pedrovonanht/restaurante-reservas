@@ -65,7 +65,7 @@ async function create(restaurantId, eventInputValues) {
       eventInputValues.preset_id ?? null,
     ],
   });
-
+  console.log
   return formatEventRow(result.rows[0]);
 }
 
