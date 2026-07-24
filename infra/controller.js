@@ -1,4 +1,5 @@
 import {
+  BusinessRuleError,
   ForbiddenError,
   InternalServerError,
   MethodNotAllowedError,
@@ -21,7 +22,8 @@ function onError(error, request, response) {
     error instanceof MethodNotAllowedError ||
     error instanceof NotFoundError ||
     error instanceof UnauthorizedError ||
-    error instanceof ForbiddenError
+    error instanceof ForbiddenError ||
+    error instanceof BusinessRuleError
   ) {
     return response.status(error.statusCode).json(error);
   }
