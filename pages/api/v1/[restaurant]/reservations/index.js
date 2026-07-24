@@ -11,7 +11,6 @@ export default router.handler(controller.errorHandlers);
 
 async function postHandler(request, response) {
   const restaurantObject = await restaurant.findOneBySlug(request.query.restaurant)
-  console.log(restaurantObject)
-  const reservationObject = await reservation.create(restaurantObject.id, request.body) 
+  const reservationObject = await reservation.create(restaurantObject.id, request.body)
   return response.status(201).json(reservationObject);
 }

@@ -124,9 +124,62 @@ function formatPublicReservation(row) {
   };
 }
 
+async function findAllByRestaurantId(restaurantId, { from, to } = {}) {
+  const values = [restaurantId];
+  let filter = "";
+
+  if (from) {
+    values.push(from);
+    filter += ` AND e.event_date >= $${values.length}`;
+  }
+  if (to) {
+    values.push(to);
+    filter += ` AND e.event_date <= $${values.length}`;
+  }
+
+  const result = await database.query({
+    text: `
+      SELECT
+        r.id, r.guest_phone, r.guest_name, r.party_size,
+        r.restaurant_id, r.public_token, r.created_at, r.updated_at,
+        e.id AS event_id, e.event_date AS event_date,
+        e.name AS event_name, e.capacity AS event_capacity
+      FROM reservations r
+      JOIN events e ON e.id = r.event_id
+      WHERE r.restaurant_id = $1${filter}
+      ORDER BY r.created_at ASC`,
+    values,
+  });
+
+  return result.rows.map(formatOwnerReservation);
+}
+
+function formatOwnerReservation(row) {
+  return {
+    id: row.id,
+    guest_phone: row.guest_phone,
+    guest_name: row.guest_name,
+    party_size: row.party_size,
+    event: {
+      id: row.event_id,
+      event_date:
+        row.event_date instanceof Date
+          ? row.event_date.toISOString().slice(0, 10)
+          : row.event_date,
+      name: row.event_name,
+      capacity: row.event_capacity,
+    },
+    restaurant_id: row.restaurant_id,
+    public_token: row.public_token,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
 const reservation = {
     create,
-    findOneByRestaurantIdAndToken
+    findOneByRestaurantIdAndToken,
+    findAllByRestaurantId
 }
 
 export default reservation;
