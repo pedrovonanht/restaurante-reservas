@@ -123,6 +123,16 @@ function filterOutput(feature, output) {
     };
   }
 
+  if (feature === "read:restaurant:self") {
+    filteredOutputValues = {
+        name: output.name,
+        id: output.id,
+        max_covers: output.max_covers,
+        slug: output.slug,
+        role: output.role
+    }
+  }
+
   // Força a limpeza de valores "undefined"
   return JSON.parse(JSON.stringify(filteredOutputValues));
 }

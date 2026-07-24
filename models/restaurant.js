@@ -87,6 +87,32 @@ async function findOneBySlug(slug) {
   }
 }
 
+async function findOneById(id) {
+  return await runSelectQuery(id);
+
+  async function runSelectQuery(id) {
+    const result = await database.query({
+      text: `
+      SELECT
+      *
+      FROM
+      restaurants
+      WHERE
+      id=$1
+      `,
+      values: [id],
+    });
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError({
+        message: "O `id` informado não foi encontrado no sistema.",
+        action: "Verifique o `id` informado.",
+      });
+    }
+    return result.rows[0];
+  }
+}
+
 function slugify(text) {
   return text
     .toString()
@@ -140,5 +166,5 @@ async function update(recieviedSlug, restaurantInputValues) {
   }
 }
 
-const restaurant = { create, findOneBySlug, update };
+const restaurant = { create, findOneBySlug, findOneById, update };
 export default restaurant;
