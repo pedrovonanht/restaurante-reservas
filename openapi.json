@@ -1,0 +1,1229 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Restaurante SaaS API",
+    "version": "1.0.0",
+    "description": "API do SaaS para restaurantes gerenciarem reservas, eventos, presets de eventos e vouchers.\n\nAutenticação é feita por um cookie de sessão httpOnly chamado `session_id`, emitido no login (`POST /sessions`) e no registro. Rotas públicas de reserva permitem que convidados criem e consultem reservas sem autenticação.\n\nTodos os erros seguem o mesmo formato: `{ name, message, action, status_code }`."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Servidor de desenvolvimento local"
+    }
+  ],
+  "tags": [
+    { "name": "Status", "description": "Saúde e status do sistema" },
+    { "name": "Migrations", "description": "Migrações de banco de dados (admin)" },
+    { "name": "Sessions", "description": "Login e logout" },
+    { "name": "Users", "description": "Cadastro e gerenciamento de usuários" },
+    { "name": "Restaurants", "description": "Gerenciamento de restaurantes" },
+    { "name": "Events", "description": "Eventos de um restaurante" },
+    { "name": "Event Presets", "description": "Modelos reutilizáveis de eventos" },
+    { "name": "Reservations", "description": "Reservas (públicas e do dono)" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session_id",
+        "description": "Cookie de sessão httpOnly emitido no login (`POST /sessions`) ou registro."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "description": "Formato padrão de erro para todas as respostas de falha.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "ValidationError",
+            "description": "Classe do erro: UnauthorizedError, ForbiddenError, ValidationError, NotFoundError, MethodNotAllowedError, BusinessRuleError, InternalServerError."
+          },
+          "message": { "type": "string", "example": "Um erro de validação ocorreu." },
+          "action": { "type": "string", "example": "Verifique o corpo da requisição." },
+          "status_code": { "type": "integer", "example": 400 }
+        },
+        "required": ["name", "message", "action", "status_code"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "username": { "type": "string", "example": "validUsername" },
+          "email": { "type": "string", "format": "email", "example": "validEmail@gmail.com" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "username", "email", "created_at", "updated_at"]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "token": { "type": "string", "example": "87810f653db5206d69a52636161fb2452b39478885f12272fb0298730588c3dd6457b7c628df09e6bfa20f4845d8af84" },
+          "user_id": { "type": "string", "format": "uuid", "example": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "expires_at": { "type": "string", "format": "date-time", "example": "2026-08-23T12:00:00.000Z" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "token", "user_id", "expires_at", "created_at", "updated_at"]
+      },
+      "Restaurant": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "name": { "type": "string", "example": "Restaurante Válido" },
+          "slug": { "type": "string", "example": "restaurante-valido" },
+          "max_covers": { "type": "integer", "example": 40 },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "name", "slug", "max_covers", "created_at", "updated_at"]
+      },
+      "RestaurantSelf": {
+        "type": "object",
+        "description": "Restaurante do qual o usuário é membro, incluindo seu papel. Formato reduzido (sem created_at/updated_at) retornado por GET /restaurants (feature read:restaurant:self).",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "name": { "type": "string", "example": "Valid Memb 1" },
+          "slug": { "type": "string", "example": "valid-memb-1" },
+          "max_covers": { "type": "integer", "example": 50 },
+          "role": { "type": "string", "enum": ["owner", "staff"], "example": "owner" }
+        },
+        "required": ["id", "name", "slug", "max_covers", "role"]
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "version": { "type": "string", "example": "18.4" },
+          "max_conections": { "type": "integer", "example": 100 },
+          "used_conections": { "type": "integer", "example": 1 },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["version", "max_conections", "used_conections", "updated_at"]
+      },
+      "Event": {
+        "type": "object",
+        "description": "Evento completo (retornado para membros com a feature read:event).",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "event_date": { "type": "string", "format": "date", "example": "2026-08-01" },
+          "event_times": {
+            "type": "array",
+            "items": { "type": "string", "example": "19:30" },
+            "example": ["19:30", "20:30"]
+          },
+          "capacity": { "type": "integer", "example": 20 },
+          "active": { "type": "boolean", "example": true },
+          "preset_id": { "type": "string", "format": "uuid", "nullable": true, "example": null },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "name", "event_date", "event_times", "capacity", "active", "preset_id", "created_at", "updated_at"]
+      },
+      "EventPublic": {
+        "type": "object",
+        "description": "Evento em formato reduzido (retornado para anônimos/não-membros; somente eventos ativos).",
+        "properties": {
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "event_date": { "type": "string", "format": "date", "example": "2026-08-01" },
+          "event_times": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["19:30"]
+          }
+        },
+        "required": ["name", "event_date", "event_times"]
+      },
+      "EventInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "event_date": { "type": "string", "format": "date", "example": "2026-08-01" },
+          "event_times": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "example": ["19:30", "20:30"]
+          },
+          "capacity": { "type": "integer", "description": "Opcional. Se omitido, usa o max_covers do restaurante.", "example": 20 },
+          "active": { "type": "boolean", "description": "Opcional. Padrão true.", "example": true },
+          "preset_id": { "type": "string", "format": "uuid", "nullable": true, "description": "Opcional. Padrão null.", "example": null }
+        },
+        "required": ["name", "event_date", "event_times"]
+      },
+      "EventUpdateInput": {
+        "type": "object",
+        "description": "Atualização parcial de evento. Pelo menos um campo deve ser enviado.",
+        "properties": {
+          "name": { "type": "string", "example": "Noite de Fondue (novo nome)" },
+          "event_date": { "type": "string", "format": "date", "example": "2026-08-15" },
+          "event_times": { "type": "array", "items": { "type": "string" }, "example": ["19:30", "20:30"] },
+          "capacity": { "type": "integer", "example": 30 },
+          "active": { "type": "boolean", "example": false },
+          "preset_id": { "type": "string", "format": "uuid", "nullable": true, "example": null }
+        }
+      },
+      "EventPreset": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "b3a1d016-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "capacity": { "type": "integer", "example": 25 },
+          "event_times": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["19:30", "20:30", "21:30"]
+          },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "name", "capacity", "event_times", "created_at", "updated_at"]
+      },
+      "EventPresetInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "capacity": { "type": "integer", "example": 25 },
+          "event_times": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "example": ["19:30", "20:30", "21:30"]
+          }
+        },
+        "required": ["name", "capacity", "event_times"]
+      },
+      "EventPresetUpdateInput": {
+        "type": "object",
+        "description": "Atualização parcial de preset. Pelo menos um campo deve ser enviado.",
+        "properties": {
+          "name": { "type": "string", "example": "Noite de Fondue" },
+          "capacity": { "type": "integer", "example": 50 },
+          "event_times": { "type": "array", "items": { "type": "string" }, "example": ["18:30", "19:30", "20:30"] }
+        }
+      },
+      "ReservationOwner": {
+        "type": "object",
+        "description": "Reserva com dados completos, retornada para membros do restaurante.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "guest_phone": { "type": "string", "example": "53991841962" },
+          "guest_name": { "type": "string", "example": "Carlos" },
+          "party_size": { "type": "integer", "example": 5 },
+          "event": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid", "example": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+              "event_date": { "type": "string", "format": "date", "example": "2026-08-01" },
+              "name": { "type": "string", "example": "Noite de Fondue" },
+              "capacity": { "type": "integer", "example": 40 }
+            }
+          },
+          "restaurant_id": { "type": "string", "format": "uuid", "example": "c1d0161a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "public_token": { "type": "string", "example": "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_aBcDe" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "guest_phone", "guest_name", "party_size", "event", "restaurant_id", "public_token", "created_at", "updated_at"]
+      },
+      "ReservationCreated": {
+        "type": "object",
+        "description": "Reserva recém-criada retornada na criação pública.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "event_id": { "type": "string", "format": "uuid", "example": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "restaurant_id": { "type": "string", "format": "uuid", "example": "c1d0161a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "party_size": { "type": "integer", "example": 5 },
+          "guest_name": { "type": "string", "example": "Carlos" },
+          "guest_phone": { "type": "string", "example": "53991841962" },
+          "public_token": { "type": "string", "description": "Token público (43 caracteres) para consulta da reserva.", "example": "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_aBcDe" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "event_id", "restaurant_id", "party_size", "guest_name", "guest_phone", "public_token", "created_at", "updated_at"]
+      },
+      "ReservationInput": {
+        "type": "object",
+        "properties": {
+          "reservation_date": { "type": "string", "format": "date", "description": "Data da reserva. Deve corresponder a um evento existente e não pode estar no passado.", "example": "2026-08-20" },
+          "reservation_time": { "type": "string", "description": "Horário desejado dentro dos horários do evento.", "example": "19:30" },
+          "party_size": { "type": "string", "description": "Tamanho do grupo. Aceito como string na requisição; retornado como número.", "example": "5" },
+          "guest_name": { "type": "string", "example": "Carlos" },
+          "guest_phone": { "type": "string", "description": "Telefone do convidado. Identificador único por evento (duplicidade retorna 409).", "example": "53991841962" }
+        },
+        "required": ["reservation_date", "party_size", "guest_name", "guest_phone"]
+      },
+      "ReservationPublic": {
+        "type": "object",
+        "description": "Reserva em formato reduzido, consultada por token público (omite telefone, evento e restaurante).",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "party_size": { "type": "integer", "example": 5 },
+          "guest_name": { "type": "string", "example": "Carlos" },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "party_size", "guest_name", "created_at", "updated_at"]
+      },
+      "Migration": {
+        "type": "object",
+        "description": "Um item de migração de banco de dados.",
+        "properties": {
+          "path": { "type": "string", "example": "infra/migrations/1700000000000_create-users.js" },
+          "name": { "type": "string", "example": "1700000000000_create-users" },
+          "timestamp": { "type": "integer", "example": 1700000000000 }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Sessão inválida ou usuário não autenticado.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "name": "UnauthorizedError", "message": "Sessão inválida.", "action": "Verifique se o usuário está logado.", "status_code": 401 }
+          }
+        }
+      },
+      "MethodNotAllowed": {
+        "description": "Método HTTP não permitido para este endpoint.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "name": "MethodNotAllowedError", "message": "Método não permitido para este endpoint", "action": null, "status_code": 405 }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Erro interno inesperado.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "name": "InternalServerError", "message": "Um erro interno não esperado aconteceu.", "action": null, "status_code": 500 }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": ["Status"],
+        "summary": "Status do sistema",
+        "description": "Retorna a versão do banco e estatísticas de conexões. Público.",
+        "responses": {
+          "200": {
+            "description": "Status atual do sistema.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Status" },
+                "example": { "version": "18.4", "max_conections": 100, "used_conections": 1, "updated_at": "2026-07-24T12:00:00.000Z" }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/migrations": {
+      "get": {
+        "tags": ["Migrations"],
+        "summary": "Lista migrações pendentes",
+        "description": "Requer usuário admin (feature `read:migrations`).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de migrações pendentes (vazia se nenhuma).",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Migration" } },
+                "example": []
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature necessária.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"read:migrations\".", "status_code": 403 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "post": {
+        "tags": ["Migrations"],
+        "summary": "Executa migrações pendentes",
+        "description": "Requer usuário admin (feature `create:migrations`).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Nenhuma migração pendente foi aplicada.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Migration" } },
+                "example": []
+              }
+            }
+          },
+          "201": {
+            "description": "Migrações aplicadas.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Migration" } }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature necessária.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"create:migrations\".", "status_code": 403 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "tags": ["Sessions"],
+        "summary": "Login",
+        "description": "Autentica e cria uma sessão. Define o cookie `session_id` (httpOnly).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email", "example": "correctUser@gmail.com" },
+                  "password": { "type": "string", "example": "senha123" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sessão criada. Define o cookie de sessão.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Cookie de sessão httpOnly.",
+                "schema": { "type": "string", "example": "session_id=<token>; Max-Age=2592000; Path=/; HttpOnly" }
+              }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Session" } }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "UnauthorizedError", "message": "Dados de autenticação não conferem.", "action": "Verifique os dados enviados.", "status_code": 401 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Sessions"],
+        "summary": "Logout",
+        "description": "Expira a sessão atual e limpa o cookie `session_id`.",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Sessão expirada. Limpa o cookie de sessão.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Cookie de sessão invalidado.",
+                "schema": { "type": "string", "example": "session_id=invalid; Max-Age=-1; Path=/; HttpOnly" }
+              }
+            },
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Session" } }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Registra um novo usuário",
+        "description": "Cadastro público de usuário.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "validUsername" },
+                  "email": { "type": "string", "format": "email", "example": "validEmail@gmail.com" },
+                  "password": { "type": "string", "example": "validPassword" }
+                },
+                "required": ["username", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado (sem campo de senha).",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          },
+          "400": {
+            "description": "Erro de validação (senha obrigatória, username ou email duplicado).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "missingPassword": { "value": { "name": "ValidationError", "message": "O campo `password` é obrigatório.", "action": "Tente novamente informando uma `password`", "status_code": 400 } },
+                  "duplicatedUsername": { "value": { "name": "ValidationError", "message": "O username informado já está sendo utilizado.", "action": "Utilize outro username para realizar essa operação!", "status_code": 400 } },
+                  "duplicatedEmail": { "value": { "name": "ValidationError", "message": "O email informado já está sendo utilizado.", "action": "Utilize outro email para realizar essa operação!", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Usuário autenticado atual",
+        "description": "Retorna o usuário da sessão e renova a sessão (atualiza o cookie).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Usuário atual.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/users/{username}": {
+      "parameters": [
+        { "name": "username", "in": "path", "required": true, "description": "Username (case-insensitive).", "schema": { "type": "string" }, "example": "validUsername" }
+      ],
+      "get": {
+        "tags": ["Users"],
+        "summary": "Busca usuário por username",
+        "description": "Consulta pública.",
+        "responses": {
+          "200": {
+            "description": "Usuário encontrado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          },
+          "404": {
+            "description": "Username não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O username informado não foi encontrado no sistema.", "action": "Verifique o username informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Atualiza um usuário",
+        "description": "Somente o próprio usuário pode se atualizar. Atualização parcial.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "novoUsername" },
+                  "email": { "type": "string", "format": "email", "example": "novo@gmail.com" },
+                  "password": { "type": "string", "example": "novaSenha123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/User" } } }
+          },
+          "400": {
+            "description": "Corpo vazio ou valor duplicado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "emptyBody": { "value": { "name": "ValidationError", "message": "A requisição espera um objeto, que não foi enviado.", "action": "Verifique o corpo da requisição.", "status_code": 400 } },
+                  "duplicatedUsername": { "value": { "name": "ValidationError", "message": "O username informado já está sendo utilizado.", "action": "Utilize outro username para realizar essa operação!", "status_code": 400 } },
+                  "duplicatedEmail": { "value": { "name": "ValidationError", "message": "O email informado já está sendo utilizado.", "action": "Utilize outro email para realizar essa operação!", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Tentativa de atualizar outro usuário.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Você não possui permissão para atualizar outro usuário.", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Username não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O username informado não foi encontrado no sistema.", "action": "Verifique o username informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants": {
+      "get": {
+        "tags": ["Restaurants"],
+        "summary": "Lista restaurantes do usuário",
+        "description": "Retorna os restaurantes dos quais o usuário autenticado é membro, incluindo o papel (role) em cada um. Retorna lista vazia se o usuário não tiver nenhuma membership.",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de restaurantes do usuário.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RestaurantSelf" } },
+                "examples": {
+                  "comMemberships": { "value": [
+                    { "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 1", "slug": "valid-memb-1", "max_covers": 50, "role": "owner" },
+                    { "id": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 2", "slug": "valid-memb-2", "max_covers": 25, "role": "owner" }
+                  ] },
+                  "semMemberships": { "value": [] }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "post": {
+        "tags": ["Restaurants"],
+        "summary": "Cria um restaurante",
+        "description": "Cria o restaurante e uma membership `owner` para o usuário autenticado.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Restaurante Válido" },
+                  "max_covers": { "type": "integer", "example": 40 }
+                },
+                "required": ["name", "max_covers"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Restaurante criado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Restaurant" } } }
+          },
+          "400": {
+            "description": "Campo obrigatório ausente ou nome duplicado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } },
+                  "missingMaxCovers": { "value": { "name": "ValidationError", "message": "O campo `max_covers` é obrigatório.", "action": "Tente novamente informando um `max_covers`", "status_code": 400 } },
+                  "duplicatedName": { "value": { "name": "ValidationError", "message": "O nome informado já está sendo utilizado.", "action": "Utilize outro nome para realizar essa operação!", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "get": {
+        "tags": ["Restaurants"],
+        "summary": "Busca restaurante por slug",
+        "description": "Requer membership (owner ou staff).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Restaurante encontrado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Restaurant" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Restaurante não encontrado ou usuário sem membership.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Restaurants"],
+        "summary": "Atualiza um restaurante",
+        "description": "Requer feature `update:restaurant` (somente owner). Atualização parcial.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Valido 2" },
+                  "max_covers": { "type": "integer", "example": 100 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Restaurante atualizado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Restaurant" } } }
+          },
+          "400": {
+            "description": "Corpo vazio ou nome duplicado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "emptyBody": { "value": { "name": "ValidationError", "message": "A requisição espera um objeto, que não foi enviado.", "action": "Verifique o corpo da requisição.", "status_code": 400 } },
+                  "duplicatedName": { "value": { "name": "ValidationError", "message": "O nome informado já está sendo utilizado.", "action": "Utilize outro nome para realizar essa operação!", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem permissão para atualizar este restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"update:restaurant\" para esse restaurante.", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/events": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "get": {
+        "tags": ["Events"],
+        "summary": "Lista eventos do restaurante",
+        "description": "Acesso público. Anônimos/não-membros recebem apenas eventos ativos em formato reduzido (EventPublic); membros (owner/staff) recebem todos os eventos em formato completo (Event).",
+        "responses": {
+          "200": {
+            "description": "Lista de eventos. O formato depende da autorização.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "type": "array", "items": { "$ref": "#/components/schemas/Event" } },
+                    { "type": "array", "items": { "$ref": "#/components/schemas/EventPublic" } }
+                  ]
+                },
+                "examples": {
+                  "publico": { "value": [{ "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30"] }] },
+                  "membro": { "value": [{ "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30", "20:30"], "capacity": 20, "active": true, "preset_id": null, "created_at": "2026-07-24T12:00:00.000Z", "updated_at": "2026-07-24T12:00:00.000Z" }] }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "post": {
+        "tags": ["Events"],
+        "summary": "Cria um evento",
+        "description": "Requer membership e feature `create:event` (owner).",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventInput" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Evento criado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Event" } } }
+          },
+          "400": {
+            "description": "Campo obrigatório ausente.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } },
+                  "missingEventDate": { "value": { "name": "ValidationError", "message": "O campo `event_date` é obrigatório.", "action": "Tente novamente informando um `event_date`", "status_code": 400 } },
+                  "emptyEventTimes": { "value": { "name": "ValidationError", "message": "O campo `event_times` é obrigatório.", "action": "Tente novamente informando um `event_times`", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `create:event`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"create:event\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado ou usuário sem membership.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/events/{date}": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" },
+        { "name": "date", "in": "path", "required": true, "description": "Data atual do evento (YYYY-MM-DD).", "schema": { "type": "string", "format": "date" }, "example": "2026-08-01" }
+      ],
+      "patch": {
+        "tags": ["Events"],
+        "summary": "Atualiza um evento",
+        "description": "Requer membership e feature `update:event` (owner). Atualização parcial.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventUpdateInput" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Evento atualizado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Event" } } }
+          },
+          "400": {
+            "description": "Corpo vazio.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ValidationError", "message": "A requisição espera um objeto, que não foi enviado.", "action": "Verifique o corpo da requisição.", "status_code": 400 }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `update:event`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"update:event\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante ou evento não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "evento": { "value": { "name": "NotFoundError", "message": "O evento informado não foi encontrado no sistema.", "action": "Verifique a `data` informada.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/event-presets": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "get": {
+        "tags": ["Event Presets"],
+        "summary": "Lista presets de eventos",
+        "description": "Requer membership e feature `manage:event-preset` (owner).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de presets do restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/EventPreset" } }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `manage:event-preset`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"manage:event-preset\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado (slug) ou usuário sem membership (preset).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "semMembership": { "value": { "name": "NotFoundError", "message": "O preset informado não foi encontrado no sistema.", "action": "Verifique o `id` informado.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "post": {
+        "tags": ["Event Presets"],
+        "summary": "Cria um preset de evento",
+        "description": "Requer membership e feature `manage:event-preset` (owner).",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventPresetInput" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Preset criado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventPreset" } } }
+          },
+          "400": {
+            "description": "Campo obrigatório ausente.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } },
+                  "missingCapacity": { "value": { "name": "ValidationError", "message": "Campo `capacity` é obrigatório em presets", "action": "Tente novamente informando um `capacity`", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `manage:event-preset`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"manage:event-preset\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado (slug) ou usuário sem membership (preset).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "semMembership": { "value": { "name": "NotFoundError", "message": "O preset informado não foi encontrado no sistema.", "action": "Verifique o `id` informado.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/event-presets/{id}": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" },
+        { "name": "id", "in": "path", "required": true, "description": "ID do preset.", "schema": { "type": "string", "format": "uuid" }, "example": "b3a1d016-1c67-4c9f-8f8e-2a5b6c7d8e9f" }
+      ],
+      "patch": {
+        "tags": ["Event Presets"],
+        "summary": "Atualiza um preset de evento",
+        "description": "Requer membership e feature `manage:event-preset` (owner). Atualização parcial.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventPresetUpdateInput" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Preset atualizado.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EventPreset" } } }
+          },
+          "400": {
+            "description": "Corpo vazio.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ValidationError", "message": "A requisição espera um objeto, que não foi enviado.", "action": "Verifique o corpo da requisição.", "status_code": 400 }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `manage:event-preset`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"manage:event-preset\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado (slug) ou preset inexistente/de outro restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "preset": { "value": { "name": "NotFoundError", "message": "O preset informado não foi encontrado no sistema.", "action": "Verifique o `id` informado.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Event Presets"],
+        "summary": "Remove um preset de evento",
+        "description": "Requer membership e feature `manage:event-preset` (owner).",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Preset removido.",
+            "content": { "application/json": { "schema": { "type": "object" }, "example": {} } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Usuário sem a feature `manage:event-preset`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ForbiddenError", "message": "Usuário não pode executar esta operação.", "action": "Verifique se este usuário possui a feature \"manage:event-preset\".", "status_code": 403 }
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante não encontrado (slug) ou preset inexistente/já removido/de outro restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "preset": { "value": { "name": "NotFoundError", "message": "O preset informado não foi encontrado no sistema.", "action": "Verifique o `id` informado.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/reservations": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "get": {
+        "tags": ["Reservations"],
+        "summary": "Lista reservas do restaurante (dono)",
+        "description": "Requer membership. Retorna reservas completas. Suporta filtro por intervalo de datas do evento via `from`/`to`.",
+        "security": [{ "sessionCookie": [] }],
+        "parameters": [
+          { "name": "from", "in": "query", "required": false, "description": "Data inicial (event_date) do filtro.", "schema": { "type": "string", "format": "date" }, "example": "2026-08-01" },
+          { "name": "to", "in": "query", "required": false, "description": "Data final (event_date) do filtro.", "schema": { "type": "string", "format": "date" }, "example": "2026-08-01" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de reservas.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ReservationOwner" } }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Restaurante não encontrado ou usuário sem membership.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/{restaurant}/reservations": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "post": {
+        "tags": ["Reservations"],
+        "summary": "Cria uma reserva (público)",
+        "description": "Criação pública de reserva por um convidado. Gera um `public_token` para consulta posterior. Observação: esta rota fica fora do prefixo `/restaurants` — o caminho é `/{restaurant}/reservations`.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationInput" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Reserva criada.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationCreated" } } }
+          },
+          "404": {
+            "description": "Nenhum evento encontrado para a data informada.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "Não foi encontrado um evento para essa data.", "action": "Verifique a data e tente novamente", "status_code": 404 }
+              }
+            }
+          },
+          "409": {
+            "description": "Telefone já possui reserva para este evento (duplicidade).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "BusinessRuleError", "message": "O limite de reservas foi atingido para essa data.", "action": "Tente outra data disponível.", "status_code": 409 }
+              }
+            }
+          },
+          "422": {
+            "description": "Sem vagas disponíveis ou data no passado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "semVaga": { "value": { "name": "BusinessRuleError", "message": "O limite de reservas foi atingido para essa data.", "action": "Tente outra data disponível.", "status_code": 422 } },
+                  "dataNoPassado": { "value": { "name": "ValidationError", "message": "A `reservation_date` não pode estar no passado.", "action": "Verifique a data e tente novamente.", "status_code": 422 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/{restaurant}/reservations/{token}": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" },
+        { "name": "token", "in": "path", "required": true, "description": "Token público da reserva (43 caracteres).", "schema": { "type": "string" }, "example": "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_aBcDe" }
+      ],
+      "get": {
+        "tags": ["Reservations"],
+        "summary": "Consulta reserva por token (público)",
+        "description": "Consulta pública de uma reserva pelo token. Retorna dados reduzidos (sem telefone/evento/restaurante). Observação: esta rota fica fora do prefixo `/restaurants`.",
+        "responses": {
+          "200": {
+            "description": "Reserva encontrada.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationPublic" } } }
+          },
+          "404": {
+            "description": "Token inválido / reserva não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "Reserva não encontrada no sistema.", "action": "Verifique a url e tente novamente.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    }
+  }
+}
