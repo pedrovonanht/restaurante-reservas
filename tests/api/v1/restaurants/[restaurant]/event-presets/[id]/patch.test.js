@@ -391,6 +391,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () => 
         id: createdPreset.id,
         name: "Noite de Fondue Especial",
         capacity: 20,
+        event_times: ["19:30", "20:30", "21:30"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -436,6 +437,46 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () => 
       expect(responseBody.updated_at > responseBody.created_at).toBe(true);
     });
 
+    test("With new `event_times`", async () => {
+      const ownerUser = await orchestrator.createUser();
+      const createdRestaurant = await orchestrator.createRestaurant(
+        ownerUser.id,
+        {
+          name: "Preset Patch New Event Times",
+          max_covers: 30,
+        },
+      );
+      const createdPreset = await orchestrator.createEventPreset(
+        createdRestaurant.id,
+        {
+          name: "Noite de Fondue",
+          event_times: ["19:30", "20:30", "21:30"],
+          capacity: 20,
+        },
+      );
+      const sessionObject = await orchestrator.createSession(ownerUser.id);
+
+      const response = await fetch(
+        `http://localhost:3000/api/v1/restaurants/preset-patch-new-event-times/event-presets/${createdPreset.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            event_times: ["18:30", "19:30", "20:30"],
+          }),
+        },
+      );
+
+      
+      expect(response.status).toBe(200);
+      const responseBody = await response.json();
+      expect(Array.isArray(responseBody.event_times)).toBe(true);
+      expect(responseBody.event_times.length > 0).toBe(true);
+      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
+    });
     test("With no object on request", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
