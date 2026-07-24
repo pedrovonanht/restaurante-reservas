@@ -29,5 +29,15 @@ async function findOneByRestaurantIdAndUserId(restaurantId, userId) {
   return result.rows[0];
 }
 
-const membership = { create, findOneByRestaurantIdAndUserId };
+
+async function findAllByUserId(userId) {
+  const result = await database.query({
+    text: `SELECT * FROM memberships WHERE user_id = $1 ORDER BY created_at ASC`,
+    values: [userId],
+  });
+
+  return result.rows;
+}
+
+const membership = { create, findOneByRestaurantIdAndUserId, findAllByUserId };
 export default membership;
