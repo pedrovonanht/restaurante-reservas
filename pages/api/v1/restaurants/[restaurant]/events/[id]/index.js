@@ -8,9 +8,45 @@ import { createRouter } from "next-connect";
 const router = createRouter();
 router.use(controller.injectAnonymousOrUser);
 router.use(controller.injectNullOrMembership);
+router.get(getHandler);
 router.patch(controller.canUserRequest(), patchHandler);
 
 export default router.handler(controller.errorHandlers);
+
+async function getHandler(request, response) {
+  const restaurantObject = await restaurant.findOneBySlug(
+    request.query.restaurant,
+  );
+
+  const membershipObject = request.context.membership;
+
+  const eventObject = await event.findOneByRestaurantIdAndId(
+    restaurantObject.id,
+    request.query.id,
+  );
+
+  if (!eventObject) {
+    throw new NotFoundError({
+      message: "O evento informado não foi encontrado no sistema.",
+      action: "Verifique o `id` informado.",
+    });
+  }
+
+  if (authorization.can(membershipObject, "read:event")) {
+    const filteredEvent = authorization.filterOutput("read:event", eventObject);
+    return response.status(200).json(filteredEvent);
+  }
+
+  if (!eventObject.active) {
+    throw new NotFoundError({
+      message: "O evento informado não foi encontrado no sistema.",
+      action: "Verifique o `id` informado.",
+    });
+  }
+
+  const publicEvent = authorization.filterOutput("read:event:public", eventObject);
+  return response.status(200).json(publicEvent);
+}
 
 async function patchHandler(request, response) {
   const restaurantObject = await restaurant.findOneBySlug(
@@ -36,7 +72,7 @@ async function patchHandler(request, response) {
 
   const updatedEvent = await event.update(
     restaurantObject.id,
-    request.query.date,
+    request.query.id,
     request.body,
   );
   const filteredEvent = authorization.filterOutput("read:event", updatedEvent);

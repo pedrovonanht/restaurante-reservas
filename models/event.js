@@ -16,6 +16,19 @@ function formatEventRow(row) {
   };
 }
 
+function formatEventWithOcupation(row) {
+  if (!row) return row;
+
+  return {
+    ...formatEventRow(row),
+    ocupation: {
+      reservations: Number(row.reservations_count),
+      capacity: row.capacity,
+      people: Number(row.people_count),
+    },
+  };
+}
+
 async function create(restaurantId, eventInputValues) {
   if (!eventInputValues?.name) {
     throw new ValidationError({
@@ -65,17 +78,43 @@ async function create(restaurantId, eventInputValues) {
       eventInputValues.preset_id ?? null,
     ],
   });
-  console.log
   return formatEventRow(result.rows[0]);
 }
 
 async function findAllByRestaurantId(restaurantId) {
   const result = await database.query({
-    text: `SELECT * FROM events WHERE restaurant_id = $1 ORDER BY event_date ASC`,
+    text: `
+      SELECT
+        e.*,
+        COUNT(r.id)::int AS reservations_count,
+        COALESCE(SUM(r.party_size), 0)::int AS people_count
+      FROM events e
+      LEFT JOIN reservations r ON r.event_id = e.id
+      WHERE e.restaurant_id = $1
+      GROUP BY e.id
+      ORDER BY e.event_date ASC`,
     values: [restaurantId],
   });
 
-  return result.rows.map(formatEventRow);
+  return result.rows.map(formatEventWithOcupation);
+}
+
+async function findOneByRestaurantIdAndId(restaurantId, id) {
+  const result = await database.query({
+    text: `
+      SELECT
+        e.*,
+        COUNT(r.id)::int AS reservations_count,
+        COALESCE(SUM(r.party_size), 0)::int AS people_count
+      FROM events e
+      LEFT JOIN reservations r ON r.event_id = e.id
+      WHERE e.restaurant_id = $1 AND e.id = $2
+      GROUP BY e.id
+      LIMIT 1`,
+    values: [restaurantId, id],
+  });
+
+  return formatEventWithOcupation(result.rows[0]);
 }
 
 async function findOneByRestaurantIdAndDate(restaurantId, eventDate) {
@@ -87,7 +126,7 @@ async function findOneByRestaurantIdAndDate(restaurantId, eventDate) {
   return formatEventRow(result.rows[0]);
 }
 
-async function update(restaurantId, currentEventDate, eventInputValues) {
+async function update(restaurantId, eventId, eventInputValues) {
   if (!eventInputValues || Object.keys(eventInputValues).length === 0) {
     throw new ValidationError({
       message: "A requisição espera um objeto, que não foi enviado.",
@@ -95,15 +134,12 @@ async function update(restaurantId, currentEventDate, eventInputValues) {
     });
   }
 
-  const currentEvent = await findOneByRestaurantIdAndDate(
-    restaurantId,
-    currentEventDate,
-  );
+  const currentEvent = await findOneByRestaurantIdAndId(restaurantId, eventId);
 
   if (!currentEvent) {
     throw new NotFoundError({
       message: "O evento informado não foi encontrado no sistema.",
-      action: "Verifique a `data` informada.",
+      action: "Verifique o `id` informado.",
     });
   }
 
@@ -131,6 +167,7 @@ async function update(restaurantId, currentEventDate, eventInputValues) {
 const event = {
   create,
   findAllByRestaurantId,
+  findOneByRestaurantIdAndId,
   findOneByRestaurantIdAndDate,
   update,
 };

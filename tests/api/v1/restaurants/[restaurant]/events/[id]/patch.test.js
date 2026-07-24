@@ -7,7 +7,7 @@ beforeAll(async () => {
   await orchestrator.runPendingMigrations();
 });
 
-describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
+describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
   describe("Anonymous user", () => {
     test("With no session", async () => {
       const ownerUser = await orchestrator.createUser();
@@ -18,14 +18,14 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-no-session/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-no-session/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -59,14 +59,14 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-invalid-session/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-invalid-session/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -102,7 +102,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -112,7 +112,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       jest.useRealTimers();
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-expired-session/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-expired-session/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -146,7 +146,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -156,7 +156,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(otherUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-no-membership/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-no-membership/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -199,7 +199,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
         restaurantId: otherRestaurant.id,
         role: "owner",
       });
-      await orchestrator.createEvent(otherRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(otherRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -208,7 +208,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-outro-dono/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-outro-dono/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -240,7 +240,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -255,7 +255,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(staffUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-staff-membership/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-staff-membership/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -283,7 +283,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/non-existent-events-patch/events/2026-08-01",
+        "http://localhost:3000/api/v1/restaurants/non-existent-events-patch/events/8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f",
         {
           method: "PATCH",
           headers: {
@@ -306,16 +306,16 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       });
     });
 
-    test("With nonexistent event date", async () => {
+    test("With nonexistent event id", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Patch Nonexistent Date",
+        name: "Events Patch Nonexistent Id",
         max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-nonexistent-date/events/2026-12-25",
+        "http://localhost:3000/api/v1/restaurants/events-patch-nonexistent-id/events/8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f",
         {
           method: "PATCH",
           headers: {
@@ -333,7 +333,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       expect(responseBody).toEqual({
         name: "NotFoundError",
         message: "O evento informado não foi encontrado no sistema.",
-        action: "Verifique a `data` informada.",
+        action: "Verifique o `id` informado.",
         status_code: 404,
       });
     });
@@ -347,7 +347,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -356,7 +356,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-new-name/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-new-name/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -394,7 +394,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -402,7 +402,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-toggle-active/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-toggle-active/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -430,7 +430,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -438,7 +438,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-new-date/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-new-date/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {
@@ -466,7 +466,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
           max_covers: 30,
         },
       );
-      await orchestrator.createEvent(createdRestaurant.id, {
+      const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
@@ -474,7 +474,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[date]`", () => {
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-patch-no-object/events/2026-08-01",
+        `http://localhost:3000/api/v1/restaurants/events-patch-no-object/events/${createdEvent.id}`,
         {
           method: "PATCH",
           headers: {

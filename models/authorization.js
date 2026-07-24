@@ -75,6 +75,7 @@ function filterOutput(feature, output) {
       capacity: output.capacity,
       active: output.active,
       preset_id: output.preset_id,
+      ocupation: output.ocupation,
       created_at: output.created_at,
       updated_at: output.updated_at,
     };
@@ -104,6 +105,7 @@ function filterOutput(feature, output) {
       capacity: item.capacity,
       active: item.active,
       preset_id: item.preset_id,
+      ocupation: item.ocupation,
       created_at: item.created_at,
       updated_at: item.updated_at,
     };
