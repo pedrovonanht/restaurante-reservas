@@ -1,26 +1,132 @@
-import { Badge } from "components/ui/badge";
+import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 
-export default function Home() {
+import { AppShell } from "components/layout/app-shell";
+import { TenantSwitcher } from "components/layout/tenant-switcher";
+import { ReservationsDateFilter } from "components/reservations/date-filter";
+import { ReservationCard } from "components/reservations/reservation-card";
+import {
+  CardListSkeleton,
+  EmptyState,
+  ErrorState,
+} from "components/common/state-views";
+import { Input } from "components/ui/input";
+import { useQuery } from "hooks/use-query";
+import { useTenant } from "context/tenant-context";
+import { reservations as reservationsApi } from "lib/api";
+import { resolveDateFilter, todayISO } from "lib/format";
+
+export default function HomePage() {
+  const { tenant } = useTenant();
+
+  const [filterMode, setFilterMode] = useState("month");
+  const [customDate, setCustomDate] = useState(todayISO());
+  const { from, to, label } = useMemo(
+    () => resolveDateFilter(filterMode, customDate),
+    [filterMode, customDate],
+  );
+
+  const { data, loading, error, refetch } = useQuery(
+    () => reservationsApi.listOwner(tenant, { from, to }),
+    [tenant, from, to],
+    { enabled: !!tenant },
+  );
+
+  const [query, setQuery] = useState("");
+  const [openId, setOpenId] = useState(undefined);
+
+  const list = useMemo(() => data || [], [data]);
+
+  const sorted = useMemo(
+    () =>
+      [...list].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)),
+    [list],
+  );
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter((r) => r.guest_name?.toLowerCase().includes(q));
+  }, [sorted, query]);
+
+  // Primeiro card aberto por padrão (um aberto por vez). `undefined` = usar o primeiro.
+  const effectiveOpenId =
+    openId === undefined ? (sorted[0]?.id ?? null) : openId;
+
+  const toggle = (id) =>
+    setOpenId((cur) => {
+      const eff = cur === undefined ? (sorted[0]?.id ?? null) : cur;
+      return eff === id ? null : id;
+    });
+
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center px-4 font-sans">
-      {/* Glow de fundo */}
-      <div className="absolute w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
-      <div class="z-1 flex flex-col justify-center items-center w-120 gap-2">
-        <Badge
-          variant="outline"
-          className=" bg-orange-400/50 text-neutral-100 text-md px-4 py-2 border-orange-300"
-        >
-          Em breve
-        </Badge>
-        <strong className="text-9xl ">🍽️</strong>
-        <h1 className="text-3xl text-amber-50 z-1 font-mono tracking-tight font-bold">
-          Serviço em construção
+    <AppShell>
+      <header className="bg-background px-5 pt-4 pb-3">
+        <div className="flex items-center justify-between">
+          <ReservationsDateFilter
+            mode={filterMode}
+            label={label}
+            customDate={customDate}
+            onSelectPreset={setFilterMode}
+            onSelectCustom={(date) => {
+              setCustomDate(date);
+              setFilterMode("custom");
+            }}
+          />
+          <TenantSwitcher />
+        </div>
+        <h1 className="mt-4 text-[34px] leading-none font-extrabold tracking-tight text-ink">
+          {loading ? "—" : list.length}{" "}
+          <span className="text-[oklch(0.45_0.02_262)]">
+            {list.length === 1 ? "reserva" : "reservas"}
+          </span>
         </h1>
-        <p className="text-neutral-100 text-base leading-relaxed text-center">
-          Estamos construindo uma plataforma para restaurantes gerenciarem
-          reservas e vouchers com facilidade. Em breve por aqui.
-        </p>
-      </div>
-    </div>
+      </header>
+
+      <section className="flex flex-col gap-4 px-5 py-4">
+        <div className="relative">
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar por nome"
+            className="border-transparent bg-sunken pl-9"
+            aria-label="Buscar reservas por nome"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <p className="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+            Reservas recentes
+          </p>
+
+          {loading ? (
+            <CardListSkeleton count={4} />
+          ) : error ? (
+            <ErrorState error={error} onRetry={refetch} />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title={
+                query ? "Nenhuma reserva encontrada" : "Nenhuma reserva ainda"
+              }
+              description={
+                query
+                  ? "Tente buscar por outro nome."
+                  : "As reservas desse período aparecerão aqui."
+              }
+            />
+          ) : (
+            filtered.map((reservation) => (
+              <ReservationCard
+                key={reservation.id}
+                reservation={reservation}
+                open={effectiveOpenId === reservation.id}
+                onToggle={() => toggle(reservation.id)}
+              />
+            ))
+          )}
+        </div>
+      </section>
+    </AppShell>
   );
 }

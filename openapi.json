@@ -227,6 +227,7 @@
           "guest_phone": { "type": "string", "example": "53991841962" },
           "guest_name": { "type": "string", "example": "Carlos" },
           "party_size": { "type": "integer", "example": 5 },
+          "reservation_time": { "type": "string", "description": "Horário da reserva no formato HH:MM.", "example": "19:30" },
           "event": {
             "type": "object",
             "properties": {
@@ -241,7 +242,7 @@
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "guest_phone", "guest_name", "party_size", "event", "restaurant_id", "public_token", "created_at", "updated_at"]
+        "required": ["id", "guest_phone", "guest_name", "party_size", "reservation_time", "event", "restaurant_id", "public_token", "created_at", "updated_at"]
       },
       "ReservationCreated": {
         "type": "object",
@@ -253,22 +254,23 @@
           "party_size": { "type": "integer", "example": 5 },
           "guest_name": { "type": "string", "example": "Carlos" },
           "guest_phone": { "type": "string", "example": "53991841962" },
+          "reservation_time": { "type": "string", "description": "Horário da reserva no formato HH:MM.", "example": "19:30" },
           "public_token": { "type": "string", "description": "Token público (43 caracteres) para consulta da reserva.", "example": "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_aBcDe" },
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "event_id", "restaurant_id", "party_size", "guest_name", "guest_phone", "public_token", "created_at", "updated_at"]
+        "required": ["id", "event_id", "restaurant_id", "party_size", "guest_name", "guest_phone", "reservation_time", "public_token", "created_at", "updated_at"]
       },
       "ReservationInput": {
         "type": "object",
         "properties": {
           "reservation_date": { "type": "string", "format": "date", "description": "Data da reserva. Deve corresponder a um evento existente e não pode estar no passado.", "example": "2026-08-20" },
-          "reservation_time": { "type": "string", "description": "Horário desejado dentro dos horários do evento.", "example": "19:30" },
+          "reservation_time": { "type": "string", "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$", "description": "Horário desejado dentro dos horários do evento, no formato HH:MM (24h). Obrigatório.", "example": "19:30" },
           "party_size": { "type": "string", "description": "Tamanho do grupo. Aceito como string na requisição; retornado como número.", "example": "5" },
           "guest_name": { "type": "string", "example": "Carlos" },
           "guest_phone": { "type": "string", "description": "Telefone do convidado. Identificador único por evento (duplicidade retorna 409).", "example": "53991841962" }
         },
-        "required": ["reservation_date", "party_size", "guest_name", "guest_phone"]
+        "required": ["reservation_date", "reservation_time", "party_size", "guest_name", "guest_phone"]
       },
       "ReservationPublic": {
         "type": "object",
@@ -277,10 +279,11 @@
           "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
           "party_size": { "type": "integer", "example": 5 },
           "guest_name": { "type": "string", "example": "Carlos" },
+          "reservation_time": { "type": "string", "description": "Horário da reserva no formato HH:MM.", "example": "19:30" },
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "party_size", "guest_name", "created_at", "updated_at"]
+        "required": ["id", "party_size", "guest_name", "reservation_time", "created_at", "updated_at"]
       },
       "Migration": {
         "type": "object",
@@ -1213,6 +1216,15 @@
           "201": {
             "description": "Reserva criada.",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReservationCreated" } } }
+          },
+          "400": {
+            "description": "`reservation_time` ausente ou fora do formato HH:MM.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "ValidationError", "message": "O campo `reservation_time` é obrigatorio para reservas.", "action": "Adicione esse campo e tente novamente.", "status_code": 400 }
+              }
+            }
           },
           "404": {
             "description": "Nenhum evento encontrado para a data informada.",
