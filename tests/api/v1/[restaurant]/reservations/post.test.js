@@ -201,6 +201,43 @@ describe("POST in `api/v1/restaurants`", () => {
          status_code: 409
       })
     });
+    test("With no valid `reservation_time` field", async () => {
+      const createdUser = await orchestrator.createUser();
+      const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
+        name: "NoReservationTime",
+        max_covers: "5",
+      });
+
+      await orchestrator.createEvent(createdRestaurant.id, {
+        event_date: "2026-08-20",
+        event_times: ["19:30", "20:30", "21:30"],
+        name: "Same Event",
+      })
+      // fetching as anonymous
+      const response = await fetch("http:localhost:3000/api/v1/noreservationtime/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          reservation_date: "2026-08-20",
+          reservation_time: "27:24",
+          party_size: "2",
+          guest_name: "Carlos",
+          guest_phone: "53991841962"
+        })
+      });
+
+      expect(response.status).toBe(400)
+      const responseBody2 = await response.json();
+
+      expect(responseBody2).toEqual({
+         name: "ValidationError", 
+         message: "O campo `reservation_time` é obrigatorio para reservas.",
+         action: "Adicione esse campo e tente novamente.",
+         status_code: 400
+      })
+    });
     test("With no existing event", async () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(createdUser.id, {

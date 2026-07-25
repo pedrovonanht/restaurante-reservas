@@ -9,6 +9,8 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
     await validateUniquePhone(userInputValues.guest_phone, foundEvent.id);
     validateDate(userInputValues.reservation_date)
     await validateSlots(foundEvent.id, restaurantId, userInputValues.party_size)
+    validateReservationTime(userInputValues)    
+
 
     const generatedToken = crypto.randomBytes(32).toString("base64url");
     const dataObject = {...userInputValues, restaurantId: restaurantId, eventId: foundEvent.id, public_token: generatedToken}
@@ -46,6 +48,18 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
         })
     }
     }
+    function validateReservationTime(userInputValues) {
+  const reservationTime = userInputValues?.reservation_time;
+
+  const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
+  if (typeof reservationTime !== "string" || !timeRegex.test(reservationTime)) {
+    throw new ValidationError({
+        message: "O campo `reservation_time` é obrigatorio para reservas.",
+        action: "Adicione esse campo e tente novamente."
+    })
+  }
+  return true;
+}
 }
 
   async function validateUniquePhone (phone, eventId) {
@@ -120,7 +134,7 @@ function formatPublicReservation(row) { //futuramente refatorar movendo para fil
     id: row.id,
     party_size: row.party_size,
     guest_name: row.guest_name,
-    reservation_time: row.reservation_time,
+    reservation_time: row.reservation_time.slice(0,5),
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -153,7 +167,6 @@ async function findAllByRestaurantId(restaurantId, { from, to } = {}) {
     values,
   });
 
-  console.log(result.rows.map(formatOwnerReservation))
 
   return result.rows.map(formatOwnerReservation);
 }
