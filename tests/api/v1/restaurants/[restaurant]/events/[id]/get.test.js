@@ -193,12 +193,14 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         eventId: createdEvent.id,
         guestName: "Pedro",
         guestPhone: "53991840001",
+        reservationTime: "19:30",
         partySize: 3,
       });
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: createdEvent.id,
         guestName: "Ana",
+        reservationTime: "19:30",
         guestPhone: "53991840002",
         partySize: 4,
       });

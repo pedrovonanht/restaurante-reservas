@@ -79,15 +79,16 @@ async function createEventPreset(restaurantId, presetInputValues) {
   return  await eventPreset.create(restaurantId, presetInputValues)
 }
 
-async function createReserve({ restaurantId, eventId, partySize, guestName, guestPhone }) {
+async function createReserve({ restaurantId, eventId, partySize, guestName, guestPhone, reservationTime }) {
   const events = await event.findAllByRestaurantId(restaurantId);
   const targetEvent = events.find((item) => item.id === eventId);
-
+  
   return await reservation.create(restaurantId, {
     reservation_date: targetEvent.event_date,
     party_size: partySize,
     guest_name: guestName,
     guest_phone: guestPhone,
+    reservation_time: reservationTime
   });
 }
 

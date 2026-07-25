@@ -297,6 +297,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         restaurantId: createdRestaurant.id,
         eventId: createdEvent.id,
         guestName: "Pedro",
+        reservationTime: "19:30",
         guestPhone: "53991840101",
         partySize: 2,
       });
@@ -304,6 +305,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         restaurantId: createdRestaurant.id,
         eventId: createdEvent.id,
         guestName: "Ana",
+        reservationTime: "19:30",
         guestPhone: "53991840102",
         partySize: 5,
       });
