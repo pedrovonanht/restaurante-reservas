@@ -130,6 +130,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: created_event.id,
+        reservationTime: "19:30",
         guestName: "Pedro",
         guestPhone: "53991841963",
         partySize: 1,
@@ -138,6 +139,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: created_event.id,
+        reservationTime: "19:30",
         guestName: "Filipe",
         guestPhone: "43991841964",
         partySize: 1,
@@ -167,6 +169,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
             capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
+          reservation_time: "19:30",
           public_token: responseBody[0].public_token,
           created_at: responseBody[0].created_at,
           updated_at: responseBody[0].updated_at,
@@ -183,6 +186,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
             capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
+          reservation_time: "19:30",
           public_token: responseBody[1].public_token,
           created_at: responseBody[1].created_at,
           updated_at: responseBody[1].updated_at,
@@ -229,6 +233,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         guestName: "Pedro",
         guestPhone: "53991841963",
         partySize: 1,
+        reservationTime: "19:30",
       })
 
       await orchestrator.createReserve({
@@ -237,6 +242,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         guestName: "Filipe",
         guestPhone: "43991841964",
         partySize: 1,
+        reservationTime: "19:30",
       })
 
       const response = await fetch(
@@ -319,6 +325,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: created_event.id,
+        reservationTime: "19:30",
         guestName: "Pedro",
         guestPhone: "53991841963",
         partySize: 1,
@@ -327,6 +334,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: created_event2.id,
+        reservationTime: "19:30",
         guestName: "Filipe",
         guestPhone: "43991841964",
         partySize: 1,
@@ -356,6 +364,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
             capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
+          reservation_time: "19:30",
           public_token: responseBody[0].public_token,
           created_at: responseBody[0].created_at,
           updated_at: responseBody[0].updated_at,

@@ -26,7 +26,8 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         partySize: 2,
         guestName: "Piter",
         guestPhone: "54991831963",
-        eventId: createdEvent.id 
+        eventId: createdEvent.id,
+        reservationTime: "19:30" 
       })
       // fetching as anonymous
       const response = await fetch(`http:localhost:3000/api/v1/validrestaurant/reservations/${createdReserve.public_token}`
@@ -39,6 +40,7 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
           id: responseBody.id,
           party_size: createdReserve.party_size,
           guest_name: createdReserve.guest_name,
+          reservation_time: createdReserve.reservation_time,
           created_at: responseBody.created_at,
           updated_at: responseBody.updated_at,
       })
@@ -65,7 +67,8 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         partySize: 2,
         guestName: "Piter",
         guestPhone: "54991831963",
-        eventId: createdEvent.id 
+        eventId: createdEvent.id, 
+        reservationTime: "19:30"
       })
       // fetching as anonymous
       const response = await fetch(`http:localhost:3000/api/v1/invalidtokenrestaurant/reservations/invalidtoken`

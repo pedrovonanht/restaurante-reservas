@@ -21,9 +21,9 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
     const result = await database.query({
       text: `
       INSERT INTO
-      reservations (restaurant_id, event_id, party_size, public_token, guest_name, guest_phone)
+      reservations (restaurant_id, event_id, party_size, public_token, guest_name, guest_phone, reservation_time)
       VALUES
-      ($1, $2, $3, $4, $5, $6)  
+      ($1, $2, $3, $4, $5, $6, $7)  
       RETURNING *`,
       values: [
         dataObject.restaurantId,
@@ -32,6 +32,7 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
         dataObject.public_token,
         dataObject.guest_name,
         dataObject.guest_phone,
+        dataObject.reservation_time
       ],
     });
     return result.rows[0];
@@ -114,11 +115,12 @@ async function findOneByRestaurantIdAndToken(restaurantId, token) {
   return formatPublicReservation(result.rows[0]);
 }
 
-function formatPublicReservation(row) {
+function formatPublicReservation(row) { //futuramente refatorar movendo para filteroutput
   return {
     id: row.id,
     party_size: row.party_size,
     guest_name: row.guest_name,
+    reservation_time: row.reservation_time,
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -140,7 +142,7 @@ async function findAllByRestaurantId(restaurantId, { from, to } = {}) {
   const result = await database.query({
     text: `
       SELECT
-        r.id, r.guest_phone, r.guest_name, r.party_size,
+        r.id, r.guest_phone, r.guest_name, r.party_size, r.reservation_time,
         r.restaurant_id, r.public_token, r.created_at, r.updated_at,
         e.id AS event_id, e.event_date AS event_date,
         e.name AS event_name, e.capacity AS event_capacity
@@ -150,6 +152,8 @@ async function findAllByRestaurantId(restaurantId, { from, to } = {}) {
       ORDER BY r.created_at ASC`,
     values,
   });
+
+  console.log(result.rows.map(formatOwnerReservation))
 
   return result.rows.map(formatOwnerReservation);
 }
@@ -170,6 +174,7 @@ function formatOwnerReservation(row) {
       capacity: row.event_capacity,
     },
     restaurant_id: row.restaurant_id,
+    reservation_time: row.reservation_time.slice(0,5),
     public_token: row.public_token,
     created_at: row.created_at,
     updated_at: row.updated_at,
