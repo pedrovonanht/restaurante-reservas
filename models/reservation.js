@@ -1,5 +1,6 @@
 import { NotFoundError, BusinessRuleError, ValidationError} from "infra/error";
 import event from "models/event";
+import table from "models/table";
 import database from "infra/database.js"
 import crypto from "node:crypto";
 
@@ -8,28 +9,38 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
     validateEvent(foundEvent)
     await validateUniquePhone(userInputValues.guest_phone, foundEvent.id);
     validateDate(userInputValues.reservation_date)
-    await validateSlots(foundEvent.id, restaurantId, userInputValues.party_size)
-    validateReservationTime(userInputValues)    
+    validateReservationTime(userInputValues)
 
+    const allocatedTable = await allocateTable(restaurantId, foundEvent.id, userInputValues.party_size)
 
     const generatedToken = crypto.randomBytes(32).toString("base64url");
-    const dataObject = {...userInputValues, restaurantId: restaurantId, eventId: foundEvent.id, public_token: generatedToken}
-    const bookingObject = await runInsertQuery(dataObject)
+    const dataObject = {...userInputValues, restaurantId: restaurantId, eventId: foundEvent.id, tableId: allocatedTable.id, public_token: generatedToken}
 
-    return bookingObject;
-    
-    
+    try {
+      const bookingObject = await runInsertQuery(dataObject)
+      return bookingObject;
+    } catch (error) {
+      if (error.cause?.code === "23505") { // para evitar erro genérico em race condition. Precisa capturar para não virar erro genérico do try catch de database
+        throw new BusinessRuleError({
+          message: "O limite de reservas foi atingido para essa data.",
+          action: "Tente outra data disponível.",
+        });
+      }
+      throw error;
+    }
+
     async function runInsertQuery(dataObject) {
     const result = await database.query({
       text: `
       INSERT INTO
-      reservations (restaurant_id, event_id, party_size, public_token, guest_name, guest_phone, reservation_time)
+      reservations (restaurant_id, event_id, table_id, party_size, public_token, guest_name, guest_phone, reservation_time)
       VALUES
-      ($1, $2, $3, $4, $5, $6, $7)  
+      ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`,
       values: [
         dataObject.restaurantId,
         dataObject.eventId,
+        dataObject.tableId,
         dataObject.party_size,
         dataObject.public_token,
         dataObject.guest_name,
@@ -69,7 +80,7 @@ const foundEvent = await event.findOneByRestaurantIdAndDate(restaurantId, userIn
   });
   if (result.rows.length > 0) {
     throw new BusinessRuleError({
-        message: "O limite de reservas foi atingido para essa data.",
+        message: "Já existe uma reserva com esse numero de telefone para essa data.",
          action: "Tente outra data disponível.",
          statusCode: 409,
     });
@@ -91,26 +102,22 @@ function validateDate(date) {
   }
 }
 
-async function validateSlots (eventId, restaurantId, requestingPartySize) {
-    const capacity = await database.query({
-    text: `SELECT capacity FROM events WHERE id=$1 AND restaurant_id=$2`,
-    values: [eventId,restaurantId],
+async function allocateTable(restaurantId, eventId, partySize) {
+  const availableTable = await table.findAvailableForEvent({
+    restaurantId,
+    eventId,
+    partySize,
   });
 
-    const alredyPartySize = await database.query({
-    text: `SELECT party_size FROM reservations WHERE event_id=$1 and restaurant_id=$2`,
-    values: [eventId, restaurantId],
-  });
-
-  let usedCapacity = 0;
-  alredyPartySize.rows.map((item) => usedCapacity+= item.party_size)
-  
-  if((usedCapacity + Number(requestingPartySize)) > capacity.rows[0].capacity) {
-     throw new BusinessRuleError({
-        message: "O limite de reservas foi atingido para essa data.",
-         action: "Tente outra data disponível.",
-    });
+  if (availableTable) {
+    return availableTable;
   }
+ 
+    throw new BusinessRuleError({
+      message: `Não há mesa disponivel para ${partySize} pessoas`,
+      action: "Tente outra data disponível.",
+    });
+  
 }
 
 async function findOneByRestaurantIdAndToken(restaurantId, token) {
@@ -158,10 +165,11 @@ async function findAllByRestaurantId(restaurantId, { from, to } = {}) {
       SELECT
         r.id, r.guest_phone, r.guest_name, r.party_size, r.reservation_time,
         r.restaurant_id, r.public_token, r.created_at, r.updated_at,
-        e.id AS event_id, e.event_date AS event_date,
-        e.name AS event_name, e.capacity AS event_capacity
+        e.id AS event_id, e.event_date AS event_date, e.name AS event_name,
+        t.name AS table_name
       FROM reservations r
       JOIN events e ON e.id = r.event_id
+      LEFT JOIN tables t ON t.id = r.table_id
       WHERE r.restaurant_id = $1${filter}
       ORDER BY r.created_at ASC`,
     values,
@@ -177,6 +185,7 @@ function formatOwnerReservation(row) {
     guest_phone: row.guest_phone,
     guest_name: row.guest_name,
     party_size: row.party_size,
+    table_name: row.table_name,
     event: {
       id: row.event_id,
       event_date:
@@ -184,7 +193,6 @@ function formatOwnerReservation(row) {
           ? row.event_date.toISOString().slice(0, 10)
           : row.event_date,
       name: row.event_name,
-      capacity: row.event_capacity,
     },
     restaurant_id: row.restaurant_id,
     reservation_time: row.reservation_time.slice(0,5),

@@ -6,9 +6,11 @@ const ROLE_PERMISSIONS = {
     "update:event",
     "manage:event-preset",
     "read:event",
-    "read:event:public"
+    "read:event:public",
+    "read:table",
+    "manage:table",
   ],
-  staff: ["read:restaurant", "read:event"],
+  staff: ["read:restaurant", "read:event", "read:table", "manage:table"],
 };
 
 const BASE_FEATURES = [];
@@ -48,14 +50,13 @@ function filterOutput(feature, output) {
       id: output.id,
       name: output.name,
       slug: output.slug,
-      max_covers: output.max_covers,
       created_at: output.created_at,
       updated_at: output.updated_at,
     };
   }
 
-    
- 
+
+
 
   if (!Array.isArray(output)) {
   if (feature === "read:event:public") {
@@ -72,10 +73,22 @@ function filterOutput(feature, output) {
       name: output.name,
       event_date: output.event_date,
       event_times: output.event_times,
-      capacity: output.capacity,
       active: output.active,
       preset_id: output.preset_id,
       ocupation: output.ocupation,
+      created_at: output.created_at,
+      updated_at: output.updated_at,
+    };
+  }
+
+  if (feature === "read:table") {
+    filteredOutputValues = {
+      id: output.id,
+      restaurant_id: output.restaurant_id,
+      name: output.name,
+      min_capacity: output.min_capacity,
+      max_capacity: output.max_capacity,
+      active: output.active,
       created_at: output.created_at,
       updated_at: output.updated_at,
     };
@@ -92,7 +105,7 @@ function filterOutput(feature, output) {
     };
 
     }
- 
+
     );
   }
   if( feature === "read:event") {
@@ -102,7 +115,6 @@ function filterOutput(feature, output) {
       name: item.name,
       event_date: item.event_date,
       event_times: item.event_times,
-      capacity: item.capacity,
       active: item.active,
       preset_id: item.preset_id,
       ocupation: item.ocupation,
@@ -111,6 +123,21 @@ function filterOutput(feature, output) {
     };
     })
   }
+
+  if (feature === "read:table") {
+    filteredOutputValues = output.map((item) => {
+      return {
+        id: item.id,
+        restaurant_id: item.restaurant_id,
+        name: item.name,
+        min_capacity: item.min_capacity,
+        max_capacity: item.max_capacity,
+        active: item.active,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      };
+    });
+  }
   }
 
 
@@ -118,7 +145,6 @@ function filterOutput(feature, output) {
     filteredOutputValues = {
       id: output.id,
       name: output.name,
-      capacity: output.capacity,
       event_times: output.event_times,
       created_at: output.created_at,
       updated_at: output.updated_at,
@@ -129,7 +155,6 @@ function filterOutput(feature, output) {
     filteredOutputValues = {
         name: output.name,
         id: output.id,
-        max_covers: output.max_covers,
         slug: output.slug,
         role: output.role
     }

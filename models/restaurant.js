@@ -10,13 +10,6 @@ async function create(userId, restaurantInputValues) {
     });
   }
 
-  if (!restaurantInputValues?.max_covers) {
-    throw new ValidationError({
-      message: "O campo `max_covers` é obrigatório.",
-      action: "Tente novamente informando um `max_covers`",
-    });
-  }
-
   await validateUniqueName(restaurantInputValues.name);
 
   const slug = slugify(restaurantInputValues.name);
@@ -24,13 +17,12 @@ async function create(userId, restaurantInputValues) {
   const newRestaurant = await database.transaction(
     async (transactionClient) => {
       const result = await transactionClient.query({
-        text: `INSERT INTO restaurants (name, slug, max_covers)
-             VALUES ($1, $2, $3)
+        text: `INSERT INTO restaurants (name, slug)
+             VALUES ($1, $2)
              RETURNING *`,
         values: [
           restaurantInputValues.name,
           slug,
-          restaurantInputValues.max_covers,
         ],
       });
       const createdRestaurant = result.rows[0];
@@ -152,12 +144,11 @@ async function update(recieviedSlug, restaurantInputValues) {
   async function runUpdateQuery(userWithNewValues) {
     const result = await database.query({
       text: `UPDATE restaurants
-             SET name=$1, max_covers=$2, slug=$3, updated_at=now()
-             WHERE id=$4
+             SET name=$1, slug=$2, updated_at=now()
+             WHERE id=$3
              RETURNING *`,
       values: [
         userWithNewValues.name,
-        userWithNewValues.max_covers,
         userWithNewValues.slug,
         userWithNewValues.id,
       ],

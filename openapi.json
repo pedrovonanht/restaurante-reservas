@@ -19,6 +19,7 @@
     { "name": "Restaurants", "description": "Gerenciamento de restaurantes" },
     { "name": "Events", "description": "Eventos de um restaurante" },
     { "name": "Event Presets", "description": "Modelos reutilizáveis de eventos" },
+    { "name": "Tables", "description": "Mesas de um restaurante e sua disponibilidade" },
     { "name": "Reservations", "description": "Reservas (públicas e do dono)" }
   ],
   "components": {
@@ -75,11 +76,10 @@
           "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
           "name": { "type": "string", "example": "Restaurante Válido" },
           "slug": { "type": "string", "example": "restaurante-valido" },
-          "max_covers": { "type": "integer", "example": 40 },
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "name", "slug", "max_covers", "created_at", "updated_at"]
+        "required": ["id", "name", "slug", "created_at", "updated_at"]
       },
       "RestaurantSelf": {
         "type": "object",
@@ -88,10 +88,9 @@
           "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
           "name": { "type": "string", "example": "Valid Memb 1" },
           "slug": { "type": "string", "example": "valid-memb-1" },
-          "max_covers": { "type": "integer", "example": 50 },
           "role": { "type": "string", "enum": ["owner", "staff"], "example": "owner" }
         },
-        "required": ["id", "name", "slug", "max_covers", "role"]
+        "required": ["id", "name", "slug", "role"]
       },
       "Status": {
         "type": "object",
@@ -115,7 +114,6 @@
             "items": { "type": "string", "example": "19:30" },
             "example": ["19:30", "20:30"]
           },
-          "capacity": { "type": "integer", "example": 20 },
           "active": { "type": "boolean", "example": true },
           "preset_id": { "type": "string", "format": "uuid", "nullable": true, "example": null },
           "ocupation": {
@@ -125,17 +123,18 @@
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "name", "event_date", "event_times", "capacity", "active", "preset_id", "created_at", "updated_at"]
+        "required": ["id", "name", "event_date", "event_times", "active", "preset_id", "created_at", "updated_at"]
       },
       "Ocupation": {
         "type": "object",
-        "description": "Ocupação de um evento: contagem de reservas, capacidade e total de pessoas.",
+        "description": "Ocupação de um evento, derivada das mesas ativas do restaurante (não há mais capacidade absoluta por evento).",
         "properties": {
-          "reservations": { "type": "integer", "description": "Número de reservas do evento.", "example": 90 },
-          "capacity": { "type": "integer", "description": "Capacidade do evento (event.capacity).", "example": 90 },
-          "people": { "type": "integer", "description": "Soma de party_size de todas as reservas.", "example": 240 }
+          "reservations": { "type": "integer", "description": "Número de reservas do evento.", "example": 2 },
+          "total_capacity": { "type": "integer", "description": "Soma de max_capacity das mesas ativas do restaurante.", "example": 12 },
+          "people": { "type": "integer", "description": "Soma de party_size de todas as reservas do evento.", "example": 7 },
+          "empty_tables": { "type": "integer", "description": "Mesas ativas do restaurante sem reserva neste evento.", "example": 0 }
         },
-        "required": ["reservations", "capacity", "people"]
+        "required": ["reservations", "total_capacity", "people", "empty_tables"]
       },
       "EventPublic": {
         "type": "object",
@@ -162,7 +161,6 @@
             "minItems": 1,
             "example": ["19:30", "20:30"]
           },
-          "capacity": { "type": "integer", "description": "Opcional. Se omitido, usa o max_covers do restaurante.", "example": 20 },
           "active": { "type": "boolean", "description": "Opcional. Padrão true.", "example": true },
           "preset_id": { "type": "string", "format": "uuid", "nullable": true, "description": "Opcional. Padrão null.", "example": null }
         },
@@ -175,7 +173,6 @@
           "name": { "type": "string", "example": "Noite de Fondue (novo nome)" },
           "event_date": { "type": "string", "format": "date", "example": "2026-08-15" },
           "event_times": { "type": "array", "items": { "type": "string" }, "example": ["19:30", "20:30"] },
-          "capacity": { "type": "integer", "example": 30 },
           "active": { "type": "boolean", "example": false },
           "preset_id": { "type": "string", "format": "uuid", "nullable": true, "example": null }
         }
@@ -185,7 +182,6 @@
         "properties": {
           "id": { "type": "string", "format": "uuid", "example": "b3a1d016-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
           "name": { "type": "string", "example": "Noite de Fondue" },
-          "capacity": { "type": "integer", "example": 25 },
           "event_times": {
             "type": "array",
             "items": { "type": "string" },
@@ -194,13 +190,12 @@
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "name", "capacity", "event_times", "created_at", "updated_at"]
+        "required": ["id", "name", "event_times", "created_at", "updated_at"]
       },
       "EventPresetInput": {
         "type": "object",
         "properties": {
           "name": { "type": "string", "example": "Noite de Fondue" },
-          "capacity": { "type": "integer", "example": 25 },
           "event_times": {
             "type": "array",
             "items": { "type": "string" },
@@ -208,14 +203,13 @@
             "example": ["19:30", "20:30", "21:30"]
           }
         },
-        "required": ["name", "capacity", "event_times"]
+        "required": ["name", "event_times"]
       },
       "EventPresetUpdateInput": {
         "type": "object",
         "description": "Atualização parcial de preset. Pelo menos um campo deve ser enviado.",
         "properties": {
           "name": { "type": "string", "example": "Noite de Fondue" },
-          "capacity": { "type": "integer", "example": 50 },
           "event_times": { "type": "array", "items": { "type": "string" }, "example": ["18:30", "19:30", "20:30"] }
         }
       },
@@ -227,14 +221,14 @@
           "guest_phone": { "type": "string", "example": "53991841962" },
           "guest_name": { "type": "string", "example": "Carlos" },
           "party_size": { "type": "integer", "example": 5 },
+          "table_name": { "type": "string", "nullable": true, "description": "Nome da mesa alocada para a reserva (null se a reserva não tiver mesa vinculada).", "example": "mesa 01" },
           "reservation_time": { "type": "string", "description": "Horário da reserva no formato HH:MM.", "example": "19:30" },
           "event": {
             "type": "object",
             "properties": {
               "id": { "type": "string", "format": "uuid", "example": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
               "event_date": { "type": "string", "format": "date", "example": "2026-08-01" },
-              "name": { "type": "string", "example": "Noite de Fondue" },
-              "capacity": { "type": "integer", "example": 40 }
+              "name": { "type": "string", "example": "Noite de Fondue" }
             }
           },
           "restaurant_id": { "type": "string", "format": "uuid", "example": "c1d0161a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
@@ -242,7 +236,41 @@
           "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
           "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
         },
-        "required": ["id", "guest_phone", "guest_name", "party_size", "reservation_time", "event", "restaurant_id", "public_token", "created_at", "updated_at"]
+        "required": ["id", "guest_phone", "guest_name", "party_size", "table_name", "reservation_time", "event", "restaurant_id", "public_token", "created_at", "updated_at"]
+      },
+      "Table": {
+        "type": "object",
+        "description": "Mesa de um restaurante, com faixa de capacidade [min_capacity, max_capacity].",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "restaurant_id": { "type": "string", "format": "uuid", "example": "c1d0161a-1c67-4c9f-8f8e-2a5b6c7d8e9f" },
+          "name": { "type": "string", "example": "mesa 01" },
+          "min_capacity": { "type": "integer", "description": "Padrão 1 se omitido na criação.", "example": 4 },
+          "max_capacity": { "type": "integer", "example": 6 },
+          "active": { "type": "boolean", "description": "false representa uma mesa \"apagada\" (soft delete); reservas antigas mantêm o vínculo.", "example": true },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" },
+          "updated_at": { "type": "string", "format": "date-time", "example": "2026-07-24T12:00:00.000Z" }
+        },
+        "required": ["id", "restaurant_id", "name", "min_capacity", "max_capacity", "active", "created_at", "updated_at"]
+      },
+      "TableInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "mesa 01" },
+          "min_capacity": { "type": "integer", "description": "Opcional. Padrão 1.", "example": 4 },
+          "max_capacity": { "type": "integer", "example": 6 }
+        },
+        "required": ["name", "max_capacity"]
+      },
+      "TableUpdateInput": {
+        "type": "object",
+        "description": "Atualização parcial de mesa. `active: false` \"apaga\" a mesa (soft delete).",
+        "properties": {
+          "name": { "type": "string", "example": "mesa 02" },
+          "min_capacity": { "type": "integer", "example": 4 },
+          "max_capacity": { "type": "integer", "example": 6 },
+          "active": { "type": "boolean", "example": false }
+        }
       },
       "ReservationCreated": {
         "type": "object",
@@ -647,8 +675,8 @@
                 "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RestaurantSelf" } },
                 "examples": {
                   "comMemberships": { "value": [
-                    { "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 1", "slug": "valid-memb-1", "max_covers": 50, "role": "owner" },
-                    { "id": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 2", "slug": "valid-memb-2", "max_covers": 25, "role": "owner" }
+                    { "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 1", "slug": "valid-memb-1", "role": "owner" },
+                    { "id": "3a1d0161-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Valid Memb 2", "slug": "valid-memb-2", "role": "owner" }
                   ] },
                   "semMemberships": { "value": [] }
                 }
@@ -672,10 +700,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string", "example": "Restaurante Válido" },
-                  "max_covers": { "type": "integer", "example": 40 }
+                  "name": { "type": "string", "example": "Restaurante Válido" }
                 },
-                "required": ["name", "max_covers"]
+                "required": ["name"]
               }
             }
           }
@@ -692,7 +719,6 @@
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "examples": {
                   "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } },
-                  "missingMaxCovers": { "value": { "name": "ValidationError", "message": "O campo `max_covers` é obrigatório.", "action": "Tente novamente informando um `max_covers`", "status_code": 400 } },
                   "duplicatedName": { "value": { "name": "ValidationError", "message": "O nome informado já está sendo utilizado.", "action": "Utilize outro nome para realizar essa operação!", "status_code": 400 } }
                 }
               }
@@ -744,8 +770,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string", "example": "Valido 2" },
-                  "max_covers": { "type": "integer", "example": 100 }
+                  "name": { "type": "string", "example": "Valido 2" }
                 }
               }
             }
@@ -813,7 +838,7 @@
                 },
                 "examples": {
                   "publico": { "value": [{ "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30"] }] },
-                  "membro": { "value": [{ "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30", "20:30"], "capacity": 20, "active": true, "preset_id": null, "ocupation": { "reservations": 3, "capacity": 20, "people": 12 }, "created_at": "2026-07-24T12:00:00.000Z", "updated_at": "2026-07-24T12:00:00.000Z" }] }
+                  "membro": { "value": [{ "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30", "20:30"], "active": true, "preset_id": null, "ocupation": { "reservations": 3, "total_capacity": 20, "people": 12, "empty_tables": 1 }, "created_at": "2026-07-24T12:00:00.000Z", "updated_at": "2026-07-24T12:00:00.000Z" }] }
                 }
               }
             }
@@ -904,7 +929,7 @@
                 },
                 "examples": {
                   "publico": { "value": { "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30"] } },
-                  "membro": { "value": { "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30", "20:30"], "capacity": 20, "active": true, "preset_id": null, "ocupation": { "reservations": 2, "capacity": 20, "people": 7 }, "created_at": "2026-07-24T12:00:00.000Z", "updated_at": "2026-07-24T12:00:00.000Z" } }
+                  "membro": { "value": { "id": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f", "name": "Noite de Fondue", "event_date": "2026-08-01", "event_times": ["19:30", "20:30"], "active": true, "preset_id": null, "ocupation": { "reservations": 2, "total_capacity": 12, "people": 7, "empty_tables": 1 }, "created_at": "2026-07-24T12:00:00.000Z", "updated_at": "2026-07-24T12:00:00.000Z" } }
                 }
               }
             }
@@ -1039,8 +1064,7 @@
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "examples": {
-                  "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } },
-                  "missingCapacity": { "value": { "name": "ValidationError", "message": "Campo `capacity` é obrigatório em presets", "action": "Tente novamente informando um `capacity`", "status_code": 400 } }
+                  "missingName": { "value": { "name": "ValidationError", "message": "O campo `name` é obrigatório.", "action": "Tente novamente informando um `name`", "status_code": 400 } }
                 }
               }
             }
@@ -1163,6 +1187,129 @@
         }
       }
     },
+    "/restaurants/{restaurant}/tables": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
+      ],
+      "get": {
+        "tags": ["Tables"],
+        "summary": "Lista mesas do restaurante",
+        "description": "Requer membership (owner ou staff). Retorna apenas mesas ativas, ordenadas por `created_at`.",
+        "security": [{ "sessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de mesas ativas do restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Table" } }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Restaurante não encontrado ou usuário sem membership.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "post": {
+        "tags": ["Tables"],
+        "summary": "Cria uma mesa",
+        "description": "Requer membership (owner ou staff).",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TableInput" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Mesa criada.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Table" } } }
+          },
+          "400": {
+            "description": "Campo obrigatório ausente, `min_capacity` maior que `max_capacity`, ou nome duplicado entre mesas ativas.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "missingMaxCapacity": { "value": { "name": "ValidationError", "message": "Campo `max_capacity` é obrigatório em tables", "action": "Tente novamente informando um `max_capacity`", "status_code": 400 } },
+                  "minMaiorQueMax": { "value": { "name": "ValidationError", "message": "O minimo da capacidade não pode ser maior do que o máximo", "action": "Tente novamente informando um novo `min_capacity`", "status_code": 400 } },
+                  "nomeDuplicado": { "value": { "name": "ValidationError", "message": "Já existe uma mesa com essa nome.", "action": "Tente novamente informando um outro `name`.", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Restaurante não encontrado ou usuário sem membership.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/restaurants/{restaurant}/tables/{id}": {
+      "parameters": [
+        { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" },
+        { "name": "id", "in": "path", "required": true, "description": "ID da mesa.", "schema": { "type": "string", "format": "uuid" }, "example": "8f2b1d6a-1c67-4c9f-8f8e-2a5b6c7d8e9f" }
+      ],
+      "patch": {
+        "tags": ["Tables"],
+        "summary": "Atualiza uma mesa",
+        "description": "Requer membership (owner ou staff). Atualização parcial. `active: false` \"apaga\" a mesa (soft delete) mantendo o vínculo com reservas antigas.",
+        "security": [{ "sessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TableUpdateInput" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Mesa atualizada.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Table" } } }
+          },
+          "400": {
+            "description": "Corpo vazio, nome duplicado entre mesas ativas, ou `min_capacity` maior que `max_capacity`.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "emptyBody": { "value": { "name": "ValidationError", "message": "A requisição espera um objeto, que não foi enviado.", "action": "Verifique o corpo da requisição.", "status_code": 400 } },
+                  "nomeDuplicado": { "value": { "name": "ValidationError", "message": "Já existe uma mesa com essa nome.", "action": "Tente novamente informando um outro `name`.", "status_code": 400 } }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Restaurante não encontrado (slug), usuário sem membership, ou mesa inexistente/de outro restaurante.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "examples": {
+                  "restaurante": { "value": { "name": "NotFoundError", "message": "O `slug` informado não foi encontrado no sistema.", "action": "Verifique o `slug` informado.", "status_code": 404 } },
+                  "mesa": { "value": { "name": "NotFoundError", "message": "A mesa informado não foi encontrado no sistema.", "action": "Verifique o `id` informado.", "status_code": 404 } }
+                }
+              }
+            }
+          },
+          "405": { "$ref": "#/components/responses/MethodNotAllowed" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/restaurants/{restaurant}/reservations": {
       "parameters": [
         { "name": "restaurant", "in": "path", "required": true, "description": "Slug do restaurante.", "schema": { "type": "string" }, "example": "restaurante-valido" }
@@ -1240,17 +1387,17 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
-                "example": { "name": "BusinessRuleError", "message": "O limite de reservas foi atingido para essa data.", "action": "Tente outra data disponível.", "status_code": 409 }
+                "example": { "name": "BusinessRuleError", "message": "Já existe uma reserva com esse numero de telefone para essa data.", "action": "Tente outra data disponível.", "status_code": 409 }
               }
             }
           },
           "422": {
-            "description": "Sem vagas disponíveis ou data no passado.",
+            "description": "Nenhuma mesa ativa comporta o `party_size` informado, todas as mesas dessa faixa já estão ocupadas nesse evento, ou a data está no passado.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" },
                 "examples": {
-                  "semVaga": { "value": { "name": "BusinessRuleError", "message": "O limite de reservas foi atingido para essa data.", "action": "Tente outra data disponível.", "status_code": 422 } },
+                  "semMesaDisponivel": { "value": { "name": "BusinessRuleError", "message": "Não há mesa disponivel para 4 pessoas", "action": "Tente outra data disponível.", "status_code": 422 } },
                   "dataNoPassado": { "value": { "name": "ValidationError", "message": "A `reservation_date` não pode estar no passado.", "action": "Verifique a data e tente novamente.", "status_code": 422 } }
                 }
               }
