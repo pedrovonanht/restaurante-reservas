@@ -83,12 +83,10 @@ describe("GET in `api/v1/restaurants`", () => {
 
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "Valid Memb 1",
-        max_covers: 50
       })
 
       const createdRestaurant2 = await orchestrator.createRestaurant(createdUser.id, {
         name: "Valid Memb 2",
-        max_covers: 25
       })
 
       const response = await fetch("http://localhost:3000/api/v1/restaurants", {
@@ -102,13 +100,11 @@ describe("GET in `api/v1/restaurants`", () => {
       expect(responseBody).toEqual([{
         name: "Valid Memb 1",
         id: createdRestaurant.id,
-        max_covers: 50,
         slug: "valid-memb-1",
         role: "owner"
       },
       {
         name: "Valid Memb 2",
-        max_covers: 25,
         id: createdRestaurant2.id,
         slug: "valid-memb-2",
         role: "owner"
@@ -124,7 +120,6 @@ describe("GET in `api/v1/restaurants`", () => {
 
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Without Memb 1",
-        max_covers: 50
       })
 
       const createdUser = await orchestrator.createUser();

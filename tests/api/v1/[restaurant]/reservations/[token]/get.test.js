@@ -14,14 +14,13 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "validRestaurant",
-        max_covers: "10",
       });
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         event_date: "2026-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 01",
         maxCapacity: 4,
@@ -61,7 +60,6 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "invalidTokenRestaurant",
-        max_covers: "10",
       });
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         event_date: "2026-08-20",
@@ -69,7 +67,7 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         name: "Same Event",
       })
 
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 01",
         maxCapacity: 4,

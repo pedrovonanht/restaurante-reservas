@@ -14,7 +14,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables No Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -49,7 +48,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables Invalid Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -86,7 +84,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables Expired Session",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -124,7 +121,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables No Membership",
-        max_covers: 30,
       });
 
       const otherUser = await orchestrator.createUser();
@@ -160,7 +156,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables Alvo Alheio",
-        max_covers: 30,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -168,7 +163,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
         otherOwnerUser.id,
         {
           name: "Tables Outro Dono",
-          max_covers: 30,
         },
       );
 
@@ -234,7 +228,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables Valid Data",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -277,7 +270,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables no max capacity",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -310,7 +302,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables no min capacity",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -337,6 +328,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
         name: "mesa 01",
         min_capacity: 1,
         max_capacity: 6,
+        active: true,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
@@ -351,7 +343,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables min capacity greather",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -385,7 +376,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Tables Duplicated Name",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -434,13 +424,12 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
     test("With duplicated `name` with inactive table", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Tables Duplicated Name",
-        max_covers: 30,
+        name: "Tables Duplicated Name Inactive",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name/tables",
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name-inactive/tables",
         {
           method: "POST",
           headers: {
@@ -457,10 +446,10 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
       expect(response.status).toBe(201)
 
       const responseBody = await response.json();
-      orchestrator.changeTableActive(responseBody.id, false)
+      await orchestrator.changeTableActive(responseBody.id, false)
 
       const response2 = await fetch(
-        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name/tables",
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name-inactive/tables",
         {
           method: "POST",
           headers: {
@@ -482,6 +471,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
         name: "mesa 01",
         min_capacity: 4,
         max_capacity: 6,
+        active: true,
         created_at: response2Body.created_at,
         updated_at: response2Body.updated_at,
       });

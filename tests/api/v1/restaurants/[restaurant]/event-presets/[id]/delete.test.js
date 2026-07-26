@@ -15,7 +15,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete No Session",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -23,7 +22,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
 
@@ -53,7 +51,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete Invalid Session",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -61,7 +58,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
 
@@ -95,7 +91,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete Expired Session",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -103,7 +98,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);
@@ -138,7 +132,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete No Membership",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -146,7 +139,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
 
@@ -180,7 +172,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete Staff Membership",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -188,7 +179,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
 
@@ -249,7 +239,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Preset Delete Nonexistent Id",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
       const nonexistentPresetId = "b3a1d016-1c67-4c9f-8f8e-2a5b6c7d8e9f";
@@ -278,7 +267,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Preset Delete Cross Tenant",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -287,7 +275,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         otherOwnerUser.id,
         {
           name: "Preset Delete Cross Tenant Other",
-          max_covers: 30,
         },
       );
       const otherPreset = await orchestrator.createEventPreset(
@@ -295,7 +282,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Sushi",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
 
@@ -325,7 +311,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         ownerUser.id,
         {
           name: "Preset Delete Twice",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
@@ -333,7 +318,6 @@ describe("DELETE in `api/v1/restaurants/[restaurant]/event-presets/[id]`", () =>
         {
           name: "Noite de Fondue",
           event_times: ["19:30", "20:30", "21:30"],
-          capacity: 25
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);

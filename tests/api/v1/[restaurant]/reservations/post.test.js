@@ -14,7 +14,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "validRestaurant",
-        max_covers: "10",
       });
 
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -73,7 +72,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "NoCapability",
-        max_covers: "5",
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
@@ -126,7 +124,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "AlredyTakenTable",
-        max_covers: "5",
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
@@ -166,7 +163,7 @@ describe("POST in `api/v1/restaurants`", () => {
       expect(response.status).toBe(201);
 
 
-      const response2 = await fetch("http:localhost:3000/api/v1/nocapability/reservations", {
+      const response2 = await fetch("http:localhost:3000/api/v1/alredytakentable/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -184,8 +181,8 @@ describe("POST in `api/v1/restaurants`", () => {
       const responseBody2 = await response2.json();
 
       expect(responseBody2).toEqual({
-         name: "BusinessRuleError", 
-         message: "O limite de reservas foi atingido para essa data.",
+         name: "BusinessRuleError",
+         message: "Não há mesa disponivel para 2 pessoas",
          action: "Tente outra data disponível.",
          status_code: 422
       })
@@ -194,7 +191,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "NoAvaliableFit",
-        max_covers: "5",
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
@@ -233,7 +229,7 @@ describe("POST in `api/v1/restaurants`", () => {
       expect(response.status).toBe(201);
 
 
-      const response2 = await fetch("http:localhost:3000/api/v1/nocapability/reservations", {
+      const response2 = await fetch("http:localhost:3000/api/v1/noavaliablefit/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -254,9 +250,9 @@ describe("POST in `api/v1/restaurants`", () => {
           id: responseBody2.id,
           event_id: createdEvent.id,
           restaurant_id: createdRestaurant.id,
-          party_size: 5,
-          guest_name: "Carlos",
-          guest_phone: "53991841962",
+          party_size: 2,
+          guest_name: "Gomez",
+          guest_phone: "53991841972",
           reservation_time: "19:30",
           public_token: responseBody2.public_token,
           created_at: responseBody2.created_at,
@@ -274,7 +270,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id)
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "Bestfit",
-        max_covers: "50",
       });
 
 
@@ -335,19 +330,25 @@ describe("POST in `api/v1/restaurants`", () => {
 
       expect(response2.status).toBe(200);
       const response2Body = await response2.json();
-      expect(response2Body[0].table_name).toBe("mesa 03");
+      expect(response2Body[0].table_name).toBe("mesa 01");
     });
     test("With duplicated booking for the same event", async () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "duplicatedBooking",
-        max_covers: "20",
       });
 
       const createdEvent =  await orchestrator.createEvent(createdRestaurant.id, {
         event_date: "2026-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
+      })
+
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 01",
+        minCapacity: 10,
+        maxCapacity: 20
       })
 
       // fetching as anonymous
@@ -405,7 +406,7 @@ describe("POST in `api/v1/restaurants`", () => {
       const responseBody2 = await response2.json();
          expect(responseBody2).toEqual({
          name: "BusinessRuleError",  //pensar se esse é o melhor nome
-         message: "O limite de reservas foi atingido para essa data.",
+         message: "Já existe uma reserva com esse numero de telefone para essa data.",
          action: "Tente outra data disponível.",
          status_code: 409
       })
@@ -414,7 +415,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "NoReservationTime",
-        max_covers: "5",
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
@@ -451,7 +451,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(createdUser.id, {
         name: "noExisting",
-        max_covers: "20",
       });
 
 
@@ -485,7 +484,6 @@ describe("POST in `api/v1/restaurants`", () => {
       const createdUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(createdUser.id, {
         name: "after",
-        max_covers: "20",
       });
 
       const dateOneMonthBehind = new Date();

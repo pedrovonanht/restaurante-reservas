@@ -14,7 +14,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Active",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -43,7 +42,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Inactive",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -90,7 +88,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Non Member",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -127,14 +124,12 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Staff",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
       });
 
@@ -162,10 +157,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
         preset_id: null,
-        ocupation: { reservations: 0, capacity: 20, people: 0 },
+        ocupation: { reservations: 0, total_capacity: 0, people: 0, empty_tables: 0 },
         created_at: createdEvent.created_at,
         updated_at: createdEvent.updated_at,
       });
@@ -177,31 +171,29 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Owner Ocupation",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
       });
 
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 01",
         maxCapacity: 4,
         minCapacity: 2
       })
 
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 02",
         maxCapacity: 4,
         minCapacity: 2
       })
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 03",
         maxCapacity: 4,
@@ -243,10 +235,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
         preset_id: null,
-        ocupation: { reservations: 2, total_capacity: 20, people: 7, empty_tables: 1 },
+        ocupation: { reservations: 2, total_capacity: 12, people: 7, empty_tables: 1 },
         created_at: createdEvent.created_at,
         updated_at: createdEvent.updated_at,
       });
@@ -258,14 +249,12 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Id Get Owner Inactive",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite Cancelada",
         event_date: "2026-08-02",
         event_times: ["19:30"],
-        capacity: 20,
         active: false,
       });
 
@@ -285,8 +274,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       expect(responseBody.active).toBe(false);
       expect(responseBody.ocupation).toEqual({
         reservations: 0,
-        capacity: 20,
+        total_capacity: 0,
         people: 0,
+        empty_tables: 0,
       });
     });
 
@@ -294,7 +284,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Id Get Nonexistent",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 

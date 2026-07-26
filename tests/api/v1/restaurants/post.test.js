@@ -19,7 +19,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Sem Sessão",
-          max_covers: 30,
         }),
       });
 
@@ -45,7 +44,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Token Inválido",
-          max_covers: 30,
         }),
       });
 
@@ -79,7 +77,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Sessão Expirada",
-          max_covers: 30,
         }),
       });
 
@@ -108,7 +105,6 @@ describe("POST in `api/v1/restaurants`", () => {
           Cookie: `session_id=${sessionObject.token}`,
         },
         body: JSON.stringify({
-          max_covers: 30,
         }),
       });
 
@@ -118,33 +114,6 @@ describe("POST in `api/v1/restaurants`", () => {
         name: "ValidationError",
         message: "O campo `name` é obrigatório.",
         action: "Tente novamente informando um `name`",
-        status_code: 400,
-      });
-    });
-
-    test("With missing `max_covers`", async () => {
-      const createdUser = await orchestrator.createUser({
-        username: "missingMaxCoversRestaurant",
-      });
-      const sessionObject = await orchestrator.createSession(createdUser.id);
-
-      const response = await fetch("http://localhost:3000/api/v1/restaurants", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: `session_id=${sessionObject.token}`,
-        },
-        body: JSON.stringify({
-          name: "Restaurante Sem Max Covers",
-        }),
-      });
-
-      expect(response.status).toBe(400);
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        name: "ValidationError",
-        message: "O campo `max_covers` é obrigatório.",
-        action: "Tente novamente informando um `max_covers`",
         status_code: 400,
       });
     });
@@ -165,7 +134,6 @@ describe("POST in `api/v1/restaurants`", () => {
           },
           body: JSON.stringify({
             name: "Primeiro Restaurante",
-            max_covers: 30,
           }),
         },
       );
@@ -181,7 +149,6 @@ describe("POST in `api/v1/restaurants`", () => {
           },
           body: JSON.stringify({
             name: "Primeiro Restaurante",
-            max_covers: 50,
           }),
         },
       );
@@ -210,7 +177,6 @@ describe("POST in `api/v1/restaurants`", () => {
         },
         body: JSON.stringify({
           name: "Restaurante Válido",
-          max_covers: 40,
         }),
       });
 
@@ -220,7 +186,6 @@ describe("POST in `api/v1/restaurants`", () => {
         id: responseBody.id,
         name: "Restaurante Válido",
         slug: "restaurante-valido",
-        max_covers: 40,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

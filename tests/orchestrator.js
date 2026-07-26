@@ -10,6 +10,7 @@ import membership from "models/membership";
 import event from "models/event";
 import eventPreset from "models/event-preset";
 import reservation from "models/reservation";
+import table from "models/table";
 
 async function clearDatabase() {
   await database.query("DROP SCHEMA PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
@@ -49,8 +50,24 @@ async function createUser(userInputValues) {
 async function createRestaurant(userId, restaurantInputValues) { //método cria membership do user como 'owner' junto
   return await restaurant.create(userId, {
     name: restaurantInputValues.name,
-    max_covers: restaurantInputValues.max_covers,
   });
+}
+
+async function createTable({ restaurantId, name, minCapacity, maxCapacity }) {
+  return await table.create(restaurantId, {
+    name,
+    min_capacity: minCapacity,
+    max_capacity: maxCapacity,
+  });
+}
+
+async function changeTableActive(tableId, active) {
+  const result = await database.query({
+    text: `UPDATE tables SET active = $1, updated_at = now() WHERE id = $2 RETURNING *`,
+    values: [active, tableId],
+  });
+
+  return result.rows[0];
 }
 
 async function createMembership({ userId, restaurantId, role }) {
@@ -112,6 +129,8 @@ const orchestrator = {
   createSession,
   createMembership,
   createRestaurant,
+  createTable,
+  changeTableActive,
   createEvent,
   createEventPreset,
   createReserve,

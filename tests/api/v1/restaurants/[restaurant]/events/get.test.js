@@ -14,7 +14,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Get Mixed Active",
-          max_covers: 30,
         },
       );
 
@@ -50,7 +49,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Get No Events",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -85,7 +83,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Get Non Member",
-          max_covers: 30,
         },
       );
 
@@ -131,7 +128,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Get Staff Full",
-          max_covers: 30,
         },
       );
 
@@ -141,7 +137,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite de Fondue",
           event_date: "2026-08-01",
           event_times: ["19:30"],
-          capacity: 20,
           active: true,
         },
       );
@@ -151,7 +146,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite Cancelada",
           event_date: "2026-08-02",
           event_times: ["19:30"],
-          capacity: 20,
           active: false,
         },
       );
@@ -181,10 +175,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite de Fondue",
           event_date: "2026-08-01",
           event_times: ["19:30"],
-          capacity: 20,
           active: true,
           preset_id: null,
-          ocupation: { reservations: 0, capacity: 20, people: 0 },
+          ocupation: { reservations: 0, total_capacity: 0, people: 0, empty_tables: 0 },
           created_at: createdEvent.created_at,
           updated_at: createdEvent.updated_at,
         },
@@ -193,10 +186,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite Cancelada",
           event_date: "2026-08-02",
           event_times: ["19:30"],
-          capacity: 20,
           active: false,
           preset_id: null,
-          ocupation: { reservations: 0, capacity: 20, people: 0 },
+          ocupation: { reservations: 0, total_capacity: 0, people: 0, empty_tables: 0 },
           created_at: createdInactiveEvent.created_at,
           updated_at: createdInactiveEvent.updated_at,
         },
@@ -209,7 +201,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Get Owner Full",
-          max_covers: 30,
         },
       );
 
@@ -219,7 +210,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite de Fondue",
           event_date: "2026-08-01",
           event_times: ["19:30"],
-          capacity: 20,
           active: true,
         },
       );
@@ -229,7 +219,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite Cancelada",
           event_date: "2026-08-02",
           event_times: ["19:30"],
-          capacity: 20,
           active: false,
         },
       );
@@ -253,10 +242,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite de Fondue",
           event_date: "2026-08-01",
           event_times: ["19:30"],
-          capacity: 20,
           active: true,
           preset_id: null,
-          ocupation: { reservations: 0, capacity: 20, people: 0 },
+          ocupation: { reservations: 0, total_capacity: 0, people: 0, empty_tables: 0 },
           created_at: createdEvent.created_at,
           updated_at: createdEvent.updated_at,
         },
@@ -265,10 +253,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite Cancelada",
           event_date: "2026-08-02",
           event_times: ["19:30"],
-          capacity: 20,
           active: false,
           preset_id: null,
-          ocupation: { reservations: 0, capacity: 20, people: 0 },
+          ocupation: { reservations: 0, total_capacity: 0, people: 0, empty_tables: 0 },
           created_at: createdInactiveEvent.created_at,
           updated_at: createdInactiveEvent.updated_at,
         },
@@ -281,7 +268,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Get Owner Ocupation",
-          max_covers: 30,
         },
       );
 
@@ -289,18 +275,17 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
       });
 
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 01",
         maxCapacity: 6,
         minCapacity: 2
       })
 
-      await orchestrator.createdTable({
+      await orchestrator.createTable({
         restaurantId: createdRestaurant.id,
         name: "mesa 02",
         maxCapacity: 6,
@@ -343,10 +328,9 @@ describe("GET in `api/v1/restaurants/[restaurant]/events`", () => {
           name: "Noite de Fondue",
           event_date: "2026-08-01",
           event_times: ["19:30"],
-          capacity: 20,
           active: true,
           preset_id: null,
-          ocupation: { reservations: 2, total_capacity: 20, people: 7, empty_tables: 0 },
+          ocupation: { reservations: 2, total_capacity: 12, people: 7, empty_tables: 0 },
           created_at: createdEvent.created_at,
           updated_at: createdEvent.updated_at,
         },

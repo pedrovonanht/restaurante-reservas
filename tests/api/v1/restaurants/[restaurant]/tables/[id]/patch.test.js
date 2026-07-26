@@ -16,7 +16,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "Restaurante No Session",
-          max_covers: 10,
         },
       );
 
@@ -56,7 +55,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "Restaurante Invalid",
-          max_covers: 10,
         },
       );
 
@@ -101,7 +99,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "Restaurante Expired",
-          max_covers: 10,
         },
       );
 
@@ -150,7 +147,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         ownerUser.id,
         {
           name: "Without membership",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -223,7 +219,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "Without Table",
-          max_covers: 30,
         },
       );
 
@@ -258,7 +253,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "With new name",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -305,7 +299,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "With new active",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -343,7 +336,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "With new min capacity",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -390,7 +382,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "With new max capacity",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -437,7 +428,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         createdUser.id,
         {
           name: "With duplicated name",
-          max_covers: 30,
         },
       );
       const createdTable = await orchestrator.createTable({
@@ -479,7 +469,7 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
       })
 
       // non active table name duplication assertions
-      orchestrator.changeTableActive(createdTable2.id, false);
+      await orchestrator.changeTableActive(createdTable2.id, false);
       const response2 = await fetch(
         `http://localhost:3000/api/v1/restaurants/with-duplicated-name/tables/${createdTable.id}`,
         {
@@ -515,7 +505,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/tables/[id]`", () => {
         ownerUser.id,
         {
           name: "No object",
-          max_covers: 30,
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);

@@ -18,7 +18,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         createdUser.id,
         {
           name: "Restaurante No Session",
-          max_covers: 10,
         },
       );
 
@@ -49,7 +48,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         createdUser.id,
         {
           name: "Restaurante Invalid",
-          max_covers: 10,
         },
       );
 
@@ -89,7 +87,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         createdUser.id,
         {
           name: "Restaurante Expired",
-          max_covers: 10,
         },
       );
 
@@ -135,7 +132,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         ownerUser.id,
         {
           name: "With valid membership",
-          max_covers: 30,
         },
       );
 
@@ -158,7 +154,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         minCapacity: 1,
         maxCapacity: 3
       })
-      orchestrator.changeTableActive(createdTable3.id, false)
+      await orchestrator.changeTableActive(createdTable3.id, false)
 
       const response = await fetch(
         `http://localhost:3000/api/v1/restaurants/${createdRestaurant.slug}/tables`,
@@ -212,7 +208,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/tables`", () => {
         ownerUser.id,
         {
           name: "Without membership",
-          max_covers: 30,
         },
       );
 

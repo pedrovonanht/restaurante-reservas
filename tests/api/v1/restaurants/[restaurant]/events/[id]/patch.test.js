@@ -15,7 +15,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch No Session",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -56,7 +55,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch Invalid Session",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -99,7 +97,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch Expired Session",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -143,7 +140,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch No Membership",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -183,7 +179,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Patch Alvo Alheio",
-        max_covers: 30,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -191,7 +186,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         otherOwnerUser.id,
         {
           name: "Events Patch Outro Dono",
-          max_covers: 30,
         },
       );
       await orchestrator.createMembership({
@@ -237,7 +231,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch Staff Membership",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -310,7 +303,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Patch Nonexistent Id",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -344,14 +336,12 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch New Name",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -376,7 +366,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         name: "Noite de Fondue Especial",
         event_date: "2026-08-01",
         event_times: ["19:30"],
-        capacity: 20,
         active: true,
         preset_id: null,
         created_at: responseBody.created_at,
@@ -391,7 +380,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch Toggle Active",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -427,7 +415,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch New Date",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
@@ -463,7 +450,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         ownerUser.id,
         {
           name: "Events Patch No Object",
-          max_covers: 30,
         },
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {

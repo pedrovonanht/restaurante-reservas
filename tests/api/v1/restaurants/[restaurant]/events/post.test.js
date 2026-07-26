@@ -14,7 +14,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post No Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -49,7 +48,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Invalid Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -86,7 +84,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Expired Session",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -124,7 +121,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post No Membership",
-        max_covers: 30,
       });
 
       const otherUser = await orchestrator.createUser();
@@ -160,7 +156,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Alvo Alheio",
-        max_covers: 30,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -168,7 +163,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         otherOwnerUser.id,
         {
           name: "Events Post Outro Dono",
-          max_covers: 30,
         },
       );
       await orchestrator.createMembership({
@@ -211,7 +205,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         ownerUser.id,
         {
           name: "Events Post Staff Membership",
-          max_covers: 30,
         },
       );
 
@@ -284,7 +277,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Valid Data",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -300,7 +292,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             name: "Noite de Fondue",
             event_date: "2026-08-01",
             event_times: ["19:30", "20:30"],
-            capacity: 20,
           }),
         },
       );
@@ -312,7 +303,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         name: "Noite de Fondue",
         event_date: "2026-08-01",
         event_times: ["19:30", "20:30"],
-        capacity: 20,
         active: true,
         preset_id: null,
         created_at: responseBody.created_at,
@@ -324,72 +314,12 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With omitted `capacity` defaulting to the restaurant's `max_covers`", async () => {
-      const ownerUser = await orchestrator.createUser();
-      await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Capacity Default",
-        max_covers: 45,
-      });
-      const sessionObject = await orchestrator.createSession(ownerUser.id);
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-capacity-default/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30"],
-          }),
-        },
-      );
-
-      expect(response.status).toBe(201);
-      const responseBody = await response.json();
-      expect(responseBody.capacity).toBe(45);
-    });
-
-    test("With explicit `capacity`", async () => {
-      const ownerUser = await orchestrator.createUser();
-      await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Capacity Explicit",
-        max_covers: 45,
-      });
-      const sessionObject = await orchestrator.createSession(ownerUser.id);
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-capacity-explicit/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30"],
-            capacity: 12,
-          }),
-        },
-      );
-
-      expect(response.status).toBe(201);
-      const responseBody = await response.json();
-      expect(responseBody.capacity).toBe(12);
-    });
-
     test("With valid `preset_id`", async () => {
       const ownerUser = await orchestrator.createUser();
       const createdRestaurant = await orchestrator.createRestaurant(
         ownerUser.id,
         {
           name: "Events Post With Preset",
-          max_covers: 30,
         },
       );
       const sessionObject = await orchestrator.createSession(ownerUser.id);
@@ -398,7 +328,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
-          capacity: 25,
           event_times: ["19:30", "20:30", "21:30"]
         },
       );
@@ -429,7 +358,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Missing Name",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -462,7 +390,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Missing Event Date",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -495,7 +422,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Events Post Missing Event Times",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
