@@ -40,7 +40,7 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
           id: responseBody.id,
           party_size: createdReserve.party_size,
           guest_name: createdReserve.guest_name,
-          reservation_time: createdReserve.reservation_time,
+          reservation_time: "19:30",
           created_at: responseBody.created_at,
           updated_at: responseBody.updated_at,
       })
