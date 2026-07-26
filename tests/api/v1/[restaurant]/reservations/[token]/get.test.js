@@ -21,6 +21,12 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
+      await orchestrator.createdTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 01",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
       const createdReserve = await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         partySize: 2,
@@ -61,6 +67,13 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         event_date: "2026-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
+      })
+
+      await orchestrator.createdTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 01",
+        maxCapacity: 4,
+        minCapacity: 2
       })
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,

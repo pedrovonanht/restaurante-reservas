@@ -188,6 +188,26 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         active: true,
       });
 
+      await orchestrator.createdTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 01",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
+
+      await orchestrator.createdTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 02",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
+      await orchestrator.createdTable({
+        restaurantId: createdRestaurant.id,
+        name: "mesa 03",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
+
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
         eventId: createdEvent.id,
@@ -226,7 +246,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
         capacity: 20,
         active: true,
         preset_id: null,
-        ocupation: { reservations: 2, capacity: 20, people: 7 },
+        ocupation: { reservations: 2, total_capacity: 20, people: 7, empty_tables: 1 },
         created_at: createdEvent.created_at,
         updated_at: createdEvent.updated_at,
       });
