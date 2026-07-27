@@ -23,8 +23,9 @@ function formatEventWithOcupation(row) {
     ...formatEventRow(row),
     ocupation: {
       reservations: Number(row.reservations_count),
-      capacity: row.capacity,
+      total_capacity: Number(row.total_capacity),
       people: Number(row.people_count),
+      empty_tables: Number(row.empty_tables),
     },
   };
 }
@@ -54,26 +55,15 @@ async function create(restaurantId, eventInputValues) {
     });
   }
 
-  let capacity = eventInputValues.capacity;
-
-  if (capacity === undefined || capacity === null) {
-    const restaurantResult = await database.query({
-      text: `SELECT max_covers FROM restaurants WHERE id = $1`,
-      values: [restaurantId],
-    });
-    capacity = restaurantResult.rows[0]?.max_covers ?? null;
-  }
-
   const result = await database.query({
-    text: `INSERT INTO events (restaurant_id, event_date, event_times, name, capacity, active, preset_id)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
+    text: `INSERT INTO events (restaurant_id, event_date, event_times, name, active, preset_id)
+           VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING *`,
     values: [
       restaurantId,
       eventInputValues.event_date,
       eventInputValues.event_times,
       eventInputValues.name,
-      capacity,
       eventInputValues.active ?? true,
       eventInputValues.preset_id ?? null,
     ],
@@ -82,12 +72,24 @@ async function create(restaurantId, eventInputValues) {
 }
 
 async function findAllByRestaurantId(restaurantId) {
-  const result = await database.query({
+  const result = await database.query({ //queries aninhadas para evitar abrir clients
     text: `
       SELECT
         e.*,
         COUNT(r.id)::int AS reservations_count,
-        COALESCE(SUM(r.party_size), 0)::int AS people_count
+        COALESCE(SUM(r.party_size), 0)::int AS people_count,
+        COALESCE((
+          SELECT SUM(t.max_capacity) FROM tables t
+          WHERE t.restaurant_id = e.restaurant_id AND t.active
+        ), 0)::int AS total_capacity,
+        COALESCE((
+          SELECT COUNT(*) FROM tables t
+          WHERE t.restaurant_id = e.restaurant_id AND t.active
+          AND NOT EXISTS (
+            SELECT 1 FROM reservations r2
+            WHERE r2.event_id = e.id AND r2.table_id = t.id
+          )
+        ), 0)::int AS empty_tables
       FROM events e
       LEFT JOIN reservations r ON r.event_id = e.id
       WHERE e.restaurant_id = $1
@@ -105,7 +107,19 @@ async function findOneByRestaurantIdAndId(restaurantId, id) {
       SELECT
         e.*,
         COUNT(r.id)::int AS reservations_count,
-        COALESCE(SUM(r.party_size), 0)::int AS people_count
+        COALESCE(SUM(r.party_size), 0)::int AS people_count,
+        COALESCE((
+          SELECT SUM(t.max_capacity) FROM tables t
+          WHERE t.restaurant_id = e.restaurant_id AND t.active
+        ), 0)::int AS total_capacity,
+        COALESCE((
+          SELECT COUNT(*) FROM tables t
+          WHERE t.restaurant_id = e.restaurant_id AND t.active
+          AND NOT EXISTS (
+            SELECT 1 FROM reservations r2
+            WHERE r2.event_id = e.id AND r2.table_id = t.id
+          )
+        ), 0)::int AS empty_tables
       FROM events e
       LEFT JOIN reservations r ON r.event_id = e.id
       WHERE e.restaurant_id = $1 AND e.id = $2
@@ -147,14 +161,13 @@ async function update(restaurantId, eventId, eventInputValues) {
 
   const result = await database.query({
     text: `UPDATE events
-           SET name=$1, event_date=$2, event_times=$3, capacity=$4, active=$5, preset_id=$6, updated_at=now()
-           WHERE id=$7
+           SET name=$1, event_date=$2, event_times=$3, active=$4, preset_id=$5, updated_at=now()
+           WHERE id=$6
            RETURNING *`,
     values: [
       eventWithNewValues.name,
       eventWithNewValues.event_date,
       eventWithNewValues.event_times,
-      eventWithNewValues.capacity,
       eventWithNewValues.active,
       eventWithNewValues.preset_id,
       eventWithNewValues.id,

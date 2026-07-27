@@ -14,7 +14,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(createdUser.id, {
         name: "no Session 1",
-        max_covers: 24,
       });
 
       const response = await fetch(
@@ -47,7 +46,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(createdUser.id, {
         name: "invalid Session 1",
-        max_covers: 24,
       });
 
       const response = await fetch(
@@ -82,7 +80,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const createdUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(createdUser.id, {
         name: "Expired Restaurant",
-        max_covers: 24,
       });
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
@@ -97,7 +94,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            max_covers: 30,
           }),
         },
       );
@@ -118,7 +114,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Sem Membership",
-        max_covers: 24,
       });
 
       const otherUser = await orchestrator.createUser();
@@ -133,7 +128,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            max_covers: 30,
           }),
         },
       );
@@ -152,7 +146,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Alvo Membership Alheio",
-        max_covers: 24,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -160,7 +153,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
         otherOwnerUser.id,
         {
           name: "Restaurante Do Outro Dono Patch",
-          max_covers: 24,
         },
       );
       await orchestrator.createMembership({
@@ -180,7 +172,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            max_covers: 30,
           }),
         },
       );
@@ -201,7 +192,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
         ownerUser.id,
         {
           name: "Restaurante Staff Patch",
-          max_covers: 24,
         },
       );
 
@@ -223,7 +213,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            max_covers: 30,
           }),
         },
       );
@@ -270,13 +259,11 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
       await orchestrator.createRestaurant(createdUser.id, {
         name: "Duplicado 1",
-        max_covers: 24,
       });
       await orchestrator.createRestaurant(
         createdUser.id,
         {
           name: "Duplicado 12",
-          max_covers: 24,
         },
       );
 
@@ -311,7 +298,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "No Object",
-          max_covers: 24,
         },
       );
       const response = await fetch(
@@ -342,7 +328,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
       await orchestrator.createRestaurant(createdUser.id, {
         name: "Valido 1",
-        max_covers: 24,
       });
 
       const response = await fetch(
@@ -366,47 +351,6 @@ describe("PATCH in `api/v1/restaurants/[restaurant]`", () => {
         id: responseBody.id,
         name: "Valido 2",
         slug: "valido-2",
-        max_covers: 24,
-        created_at: responseBody.created_at,
-        updated_at: responseBody.updated_at,
-      });
-
-      expect(uuidVersion(responseBody.id)).toBe(4);
-      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
-      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
-      expect(responseBody.updated_at > responseBody.created_at).toBe(true);
-    });
-
-    test("With new 'max_covers'", async () => {
-      const createdUser = await orchestrator.createUser();
-      const sessionObject = await orchestrator.createSession(createdUser.id);
-      await orchestrator.createRestaurant(createdUser.id, {
-        name: "maxCovert 1",
-        max_covers: 24,
-      });
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/maxcovert-1",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            max_covers: 100,
-          }),
-        },
-      );
-
-      expect(response.status).toBe(200);
-
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        id: responseBody.id,
-        name: "maxCovert 1",
-        slug: "maxcovert-1",
-        max_covers: 100,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });

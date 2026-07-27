@@ -9,16 +9,6 @@ async function create(restaurantId, presetInputValues) {
     });
   }
 
-  if (
-    presetInputValues?.capacity === undefined ||
-    presetInputValues?.capacity === null
-  ) {
-    throw new ValidationError({
-      message: "Campo `capacity` é obrigatório em presets",
-      action: "Tente novamente informando um `capacity`",
-    });
-  }
-
    if (
     !presetInputValues?.event_times ||
     presetInputValues.event_times.length === 0
@@ -30,10 +20,10 @@ async function create(restaurantId, presetInputValues) {
   }
 
   const result = await database.query({
-    text: `INSERT INTO event_presets (restaurant_id, name, capacity, event_times)
-           VALUES ($1, $2, $3, $4)
+    text: `INSERT INTO event_presets (restaurant_id, name, event_times)
+           VALUES ($1, $2, $3)
            RETURNING *`,
-    values: [restaurantId, presetInputValues.name, presetInputValues.capacity, presetInputValues.event_times],
+    values: [restaurantId, presetInputValues.name, presetInputValues.event_times],
   });
 
   return formatRow(result.rows[0]);
@@ -81,12 +71,11 @@ async function update(restaurantId, id, presetInputValues) {
 
   const result = await database.query({
     text: `UPDATE event_presets
-           SET name=$1, capacity=$2, event_times=$3, updated_at=now()
-           WHERE id=$4
+           SET name=$1, event_times=$2, updated_at=now()
+           WHERE id=$3
            RETURNING *`,
     values: [
       presetWithNewValues.name,
-      presetWithNewValues.capacity,
       presetWithNewValues.event_times,
       presetWithNewValues.id,
     ],

@@ -18,7 +18,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         createdUser.id,
         {
           name: "Restaurante No Session",
-          max_covers: 10,
         },
       );
 
@@ -43,7 +42,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         createdUser.id,
         {
           name: "Restaurante Invalid",
-          max_covers: 10,
         },
       );
 
@@ -76,7 +74,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         createdUser.id,
         {
           name: "Restaurante Expired",
-          max_covers: 10,
         },
       );
 
@@ -115,7 +112,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         ownerUser.id,
         {
           name: "With valid membership",
-          max_covers: 30,
         },
       );
 
@@ -126,6 +122,20 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         active: true,
       });
 
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 01",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
+
+       await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 02",
+        maxCapacity: 2,
+        minCapacity:1
+      })
+
       
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
@@ -133,7 +143,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         reservationTime: "19:30",
         guestName: "Pedro",
         guestPhone: "53991841963",
-        partySize: 1,
+        partySize: 3,
       })
 
       await orchestrator.createReserve({
@@ -161,12 +171,12 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
           id: responseBody[0].id,  
           guest_phone: "53991841963",
           guest_name: "Pedro",
-          party_size: 1,
+          party_size: 3,
+          table_name: "Mesa 01",
           event: {
             id: created_event.id,
             event_date: created_event.event_date,
             name: created_event.name,
-            capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
           reservation_time: "19:30",
@@ -179,11 +189,11 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
           guest_phone: "43991841964",
           guest_name: "Filipe",
           party_size: 1,
+          table_name: "Mesa 02",
           event: {
             id: created_event.id,
             event_date: created_event.event_date,
             name: created_event.name,
-            capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
           reservation_time: "19:30",
@@ -213,7 +223,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         ownerUser.id,
         {
           name: "Without membership",
-          max_covers: 30,
         },
       );
 
@@ -226,6 +235,19 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
 
       const otherUser = await orchestrator.createUser();
       const sessionObject = await orchestrator.createSession(otherUser.id);
+
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 01",
+        maxCapacity: 4
+      })
+      
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 02",
+        maxCapacity: 4
+      })
+
 
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
@@ -272,7 +294,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
             ownerUser.id,
             {
                 name: "non Existing",
-                max_covers: 30,
             },
         );
             
@@ -303,7 +324,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         ownerUser.id,
         {
           name: "With query string membership",
-          max_covers: 30,
         },
       );
 
@@ -321,6 +341,20 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         active: true,
       });
 
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 01",
+        maxCapacity: 4,
+        minCapacity: 2
+      })
+
+      await orchestrator.createTable({
+        restaurantId: createdRestaurant.id,
+        name: "Mesa 02",
+        maxCapacity: 2,
+        minCapacity: 1
+      })
+
       
       await orchestrator.createReserve({
         restaurantId: createdRestaurant.id,
@@ -328,7 +362,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
         reservationTime: "19:30",
         guestName: "Pedro",
         guestPhone: "53991841963",
-        partySize: 1,
+        partySize: 3,
       })
 
       await orchestrator.createReserve({
@@ -356,12 +390,12 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
           id: responseBody[0].id,
           guest_phone: "53991841963",
           guest_name: "Pedro",
-          party_size: 1,
+          party_size: 3,
+          table_name: "Mesa 01",
           event: {
             id: created_event.id,
             event_date: created_event.event_date,
             name: created_event.name,
-            capacity: created_event.capacity
           },
           restaurant_id: createdRestaurant.id,
           reservation_time: "19:30",

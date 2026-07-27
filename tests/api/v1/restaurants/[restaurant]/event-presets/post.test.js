@@ -14,7 +14,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post No Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -47,7 +46,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post Invalid Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -82,7 +80,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post Expired Session",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -118,7 +115,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post No Membership",
-        max_covers: 30,
       });
 
       const otherUser = await orchestrator.createUser();
@@ -152,7 +148,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post Alvo Alheio",
-        max_covers: 30,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -160,7 +155,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         otherOwnerUser.id,
         {
           name: "Presets Post Outro Dono",
-          max_covers: 30,
         },
       );
       await orchestrator.createMembership({
@@ -201,7 +195,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         ownerUser.id,
         {
           name: "Presets Post Staff Membership",
-          max_covers: 30,
         },
       );
 
@@ -269,7 +262,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post Valid Data",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -283,7 +275,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
           },
           body: JSON.stringify({
             name: "Noite de Fondue",
-            capacity: 25,
             event_times: ["19:30", "20:30", "21:30"]
           }),
         },
@@ -294,7 +285,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         name: "Noite de Fondue",
-        capacity: 25,
         event_times: ["19:30", "20:30", "21:30"],
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -305,43 +295,10 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With missing `capacity`", async () => {
-      const ownerUser = await orchestrator.createUser();
-      await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Presets Post No Capacity",
-        max_covers: 30,
-      });
-      const sessionObject = await orchestrator.createSession(ownerUser.id);
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/presets-post-no-capacity/event-presets",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            name: "Noite Sem Capacidade",
-          }),
-        },
-      );
-
-      expect(response.status).toBe(400);
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        name: "ValidationError",
-        message: "Campo `capacity` é obrigatório em presets",
-        action: "Tente novamente informando um `capacity`",
-        status_code: 400
-      })
-    });
-
     test("With missing `name`", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Post Missing Name",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -354,7 +311,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/event-presets`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            capacity: 20,
+            event_times: ["19:30"],
           }),
         },
       );

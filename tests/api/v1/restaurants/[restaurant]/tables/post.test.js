@@ -8,25 +8,25 @@ beforeAll(async () => {
   await orchestrator.runPendingMigrations();
 });
 
-describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
+describe("POST in `api/v1/restaurants/[restaurant]/tables`", () => {
   describe("Anonymous user", () => {
     test("With no session", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post No Session",
+        name: "Tables No Session",
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-no-session/events",
+        "http://localhost:3000/api/v1/restaurants/tables-no-session/tables",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -47,11 +47,11 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
 
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Invalid Session",
+        name: "Tables Invalid Session",
       });
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-invalid-session/events",
+        "http://localhost:3000/api/v1/restaurants/tables-invalid-session/tables",
         {
           method: "POST",
           headers: {
@@ -59,9 +59,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${nonexistentToken}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -83,14 +83,14 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
 
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Expired Session",
+        name: "Tables Expired Session",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       jest.useRealTimers();
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-expired-session/events",
+        "http://localhost:3000/api/v1/restaurants/tables-expired-session/tables",
         {
           method: "POST",
           headers: {
@@ -98,9 +98,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -120,14 +120,14 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
     test("Without membership", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post No Membership",
+        name: "Tables No Membership",
       });
 
       const otherUser = await orchestrator.createUser();
       const sessionObject = await orchestrator.createSession(otherUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-no-membership/events",
+        "http://localhost:3000/api/v1/restaurants/tables-no-membership/tables",
         {
           method: "POST",
           headers: {
@@ -135,9 +135,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -155,26 +155,21 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
     test("With membership in another restaurant", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Alvo Alheio",
+        name: "Tables Alvo Alheio",
       });
 
       const otherOwnerUser = await orchestrator.createUser();
-      const otherRestaurant = await orchestrator.createRestaurant(
+      await orchestrator.createRestaurant(
         otherOwnerUser.id,
         {
-          name: "Events Post Outro Dono",
+          name: "Tables Outro Dono",
         },
       );
-      await orchestrator.createMembership({
-        userId: otherOwnerUser.id,
-        restaurantId: otherRestaurant.id,
-        role: "owner",
-      });
 
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-outro-dono/events",
+        "http://localhost:3000/api/v1/restaurants/tables-outro-dono/tables",
         {
           method: "POST",
           headers: {
@@ -182,9 +177,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -196,50 +191,6 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
         message: "O `slug` informado não foi encontrado no sistema.",
         action: "Verifique o `slug` informado.",
         status_code: 404,
-      });
-    });
-
-    test("With staff membership", async () => {
-      const ownerUser = await orchestrator.createUser();
-      const createdRestaurant = await orchestrator.createRestaurant(
-        ownerUser.id,
-        {
-          name: "Events Post Staff Membership",
-        },
-      );
-
-      const staffUser = await orchestrator.createUser();
-      await orchestrator.createMembership({
-        userId: staffUser.id,
-        restaurantId: createdRestaurant.id,
-        role: "staff",
-      });
-
-      const sessionObject = await orchestrator.createSession(staffUser.id);
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-staff-membership/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
-          }),
-        },
-      );
-
-      expect(response.status).toBe(403);
-      const responseBody = await response.json();
-      expect(responseBody).toEqual({
-        name: "ForbiddenError",
-        message: "Usuário não pode executar esta operação.",
-        action: `Verifique se este usuário possui a feature "create:event" para esse restaurante.`,
-        status_code: 403,
       });
     });
 
@@ -248,7 +199,7 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const sessionObject = await orchestrator.createSession(createdUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/non-existent-events-post/events",
+        "http://localhost:3000/api/v1/restaurants/non-existent/tables",
         {
           method: "POST",
           headers: {
@@ -256,9 +207,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -273,15 +224,15 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       });
     });
 
-    test("With valid data and credentials", async () => {
+    test("With valid data", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Valid Data",
+        name: "Tables Valid Data",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-valid-data/events",
+        "http://localhost:3000/api/v1/restaurants/tables-valid-data/tables",
         {
           method: "POST",
           headers: {
@@ -289,9 +240,9 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30", "20:30"],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
@@ -300,69 +251,30 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         id: responseBody.id,
-        name: "Noite de Fondue",
-        event_date: "2026-08-01",
-        event_times: ["19:30", "20:30"],
+        restaurant_id: responseBody.restaurant_id,
+        name: "mesa 01",
         active: true,
-        preset_id: null,
+        min_capacity: 4,
+        max_capacity: 6,
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
       });
 
       expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(uuidVersion(responseBody.restaurant_id)).toBe(4);
       expect(Date.parse(responseBody.created_at)).not.toBeNaN();
       expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
     });
 
-    test("With valid `preset_id`", async () => {
-      const ownerUser = await orchestrator.createUser();
-      const createdRestaurant = await orchestrator.createRestaurant(
-        ownerUser.id,
-        {
-          name: "Events Post With Preset",
-        },
-      );
-      const sessionObject = await orchestrator.createSession(ownerUser.id);
-
-      const createdPreset = await orchestrator.createEventPreset(
-        createdRestaurant.id,
-        {
-          name: "Noite de Fondue",
-          event_times: ["19:30", "20:30", "21:30"]
-        },
-      );
-
-      const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-with-preset/events",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `session_id=${sessionObject.token}`,
-          },
-          body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: ["19:30"],
-            preset_id: createdPreset.id,
-          }),
-        },
-      );
-
-      expect(response.status).toBe(201);
-      const responseBody = await response.json();
-      expect(responseBody.preset_id).toBe(createdPreset.id);
-    });
-
-    test("With missing `name`", async () => {
+    test("With missing `max_capacity`", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Missing Name",
+        name: "Tables no max capacity",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-missing-name/events",
+        "http://localhost:3000/api/v1/restaurants/tables-no-max-capacity/tables",
         {
           method: "POST",
           headers: {
@@ -370,8 +282,8 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            event_date: "2026-08-01",
-            event_times: ["19:30"],
+            name: "mesa 01",
+            min_capacity: 4,
           }),
         },
       );
@@ -380,21 +292,21 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O campo `name` é obrigatório.",
-        action: "Tente novamente informando um `name`",
-        status_code: 400,
-      });
+        message: "Campo `max_capacity` é obrigatório em tables",
+        action: "Tente novamente informando um `max_capacity`",
+        status_code: 400
+      })
     });
 
-    test("With missing `event_date`", async () => {
+    test("With no `min_capacity`", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Missing Event Date",
+        name: "Tables no min capacity",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-missing-event-date/events",
+        "http://localhost:3000/api/v1/restaurants/tables-no-min-capacity/tables",
         {
           method: "POST",
           headers: {
@@ -402,8 +314,50 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_times: ["19:30"],
+            name: "mesa 01",
+            max_capacity: 6,
+          }),
+        },
+      );
+
+    expect(response.status).toBe(201);
+      const responseBody = await response.json();
+      expect(responseBody).toEqual({
+        id: responseBody.id,
+        restaurant_id: responseBody.restaurant_id,
+        name: "mesa 01",
+        min_capacity: 1,
+        max_capacity: 6,
+        active: true,
+        created_at: responseBody.created_at,
+        updated_at: responseBody.updated_at,
+      });
+
+      expect(uuidVersion(responseBody.id)).toBe(4);
+      expect(uuidVersion(responseBody.restaurant_id)).toBe(4);
+      expect(Date.parse(responseBody.created_at)).not.toBeNaN();
+      expect(Date.parse(responseBody.updated_at)).not.toBeNaN();
+    });
+
+    test("With `min_capacity` bigger than `max_capacity`", async () => {
+      const ownerUser = await orchestrator.createUser();
+      await orchestrator.createRestaurant(ownerUser.id, {
+        name: "Tables min capacity greather",
+      });
+      const sessionObject = await orchestrator.createSession(ownerUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/tables-min-capacity-greather/tables",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            name: "mesa 01",
+            min_capacity: 6,
+            max_capacity: 4,
           }),
         },
       );
@@ -412,21 +366,21 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O campo `event_date` é obrigatório.",
-        action: "Tente novamente informando um `event_date`",
-        status_code: 400,
-      });
+        message: "O minimo da capacidade não pode ser maior do que o máximo",
+        action: "Tente novamente informando um novo `min_capacity`",
+        status_code: 400
+      })
     });
 
-    test("With missing `event_times`", async () => {
+    test("With duplicated `name`", async () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
-        name: "Events Post Missing Event Times",
+        name: "Tables Duplicated Name",
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
       const response = await fetch(
-        "http://localhost:3000/api/v1/restaurants/events-post-missing-event-times/events",
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name/tables",
         {
           method: "POST",
           headers: {
@@ -434,20 +388,92 @@ describe("POST in `api/v1/restaurants/[restaurant]/events`", () => {
             Cookie: `session_id=${sessionObject.token}`,
           },
           body: JSON.stringify({
-            name: "Noite de Fondue",
-            event_date: "2026-08-01",
-            event_times: [],
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
           }),
         },
       );
+      expect(response.status).toBe(201)
 
-      expect(response.status).toBe(400);
-      const responseBody = await response.json();
+
+      const response2 = await fetch(
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name/tables",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
+          }),
+        },
+      );
+      expect(response2.status).toBe(400);
+      const responseBody = await response2.json();
       expect(responseBody).toEqual({
         name: "ValidationError",
-        message: "O campo `event_times` é obrigatório.",
-        action: "Tente novamente informando um `event_times`",
-        status_code: 400,
+        message: "Já existe uma mesa com essa nome.",
+        action: "Tente novamente informando um outro `name`.",
+        status_code: 400
+      })
+    });
+    test("With duplicated `name` with inactive table", async () => {
+      const ownerUser = await orchestrator.createUser();
+      await orchestrator.createRestaurant(ownerUser.id, {
+        name: "Tables Duplicated Name Inactive",
+      });
+      const sessionObject = await orchestrator.createSession(ownerUser.id);
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name-inactive/tables",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
+          }),
+        },
+      );
+      expect(response.status).toBe(201)
+
+      const responseBody = await response.json();
+      await orchestrator.changeTableActive(responseBody.id, false)
+
+      const response2 = await fetch(
+        "http://localhost:3000/api/v1/restaurants/tables-duplicated-name-inactive/tables",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+          body: JSON.stringify({
+            name: "mesa 01",
+            min_capacity: 4,
+            max_capacity: 6,
+          }),
+        },
+      );
+      expect(response2.status).toBe(201);
+      const response2Body = await response2.json();
+      expect(response2Body).toEqual({
+        id: response2Body.id,
+        restaurant_id: response2Body.restaurant_id,
+        name: "mesa 01",
+        min_capacity: 4,
+        max_capacity: 6,
+        active: true,
+        created_at: response2Body.created_at,
+        updated_at: response2Body.updated_at,
       });
     });
   });

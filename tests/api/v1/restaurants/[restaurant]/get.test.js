@@ -17,7 +17,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "Restaurante No Session",
-          max_covers: 10,
         },
       );
 
@@ -49,7 +48,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "Restaurante Invalid",
-          max_covers: 10,
         },
       );
 
@@ -87,7 +85,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "Restaurante Expired",
-          max_covers: 10,
         },
       );
 
@@ -130,7 +127,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
 
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Restaurante Invalid Membership",
-        max_covers: 10,
       });
 
       const outsiderUser = await orchestrator.createUser();
@@ -163,7 +159,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "Restaurante Case",
-          max_covers: 10,
         },
       );
 
@@ -188,7 +183,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         name: "Restaurante Case",
-        max_covers: 10,
         slug: "restaurante-case",
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,
@@ -206,7 +200,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         createdUser.id,
         {
           name: "Restaurantesas",
-          max_covers: 10,
         },
       );
 
@@ -241,7 +234,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Restaurante Alheio",
-        max_covers: 10,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -249,7 +241,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         otherOwnerUser.id,
         {
           name: "Restaurante Do Outro Dono",
-          max_covers: 10,
         },
       );
       await orchestrator.createMembership({
@@ -284,7 +275,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
         ownerUser.id,
         {
           name: "Restaurante Staff",
-          max_covers: 10,
         },
       );
 
@@ -310,7 +300,6 @@ describe("GET in `api/v1/restaurants/[restaurant]`", () => {
       expect(responseBody).toEqual({
         id: responseBody.id,
         name: "Restaurante Staff",
-        max_covers: 10,
         slug: "restaurante-staff",
         created_at: responseBody.created_at,
         updated_at: responseBody.updated_at,

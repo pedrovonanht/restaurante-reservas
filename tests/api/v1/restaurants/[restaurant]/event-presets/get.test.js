@@ -13,7 +13,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get No Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -37,7 +36,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get Invalid Session",
-        max_covers: 30,
       });
 
       const response = await fetch(
@@ -67,7 +65,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get Expired Session",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -98,7 +95,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get No Membership",
-        max_covers: 30,
       });
 
       const otherUser = await orchestrator.createUser();
@@ -127,7 +123,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get Alvo Alheio",
-        max_covers: 30,
       });
 
       const otherOwnerUser = await orchestrator.createUser();
@@ -135,7 +130,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         otherOwnerUser.id,
         {
           name: "Presets Get Outro Dono",
-          max_covers: 30,
         },
       );
 
@@ -166,7 +160,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         ownerUser.id,
         {
           name: "Presets Get Staff Membership",
-          max_covers: 30,
         },
       );
 
@@ -224,7 +217,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
       const ownerUser = await orchestrator.createUser();
       await orchestrator.createRestaurant(ownerUser.id, {
         name: "Presets Get Empty",
-        max_covers: 30,
       });
       const sessionObject = await orchestrator.createSession(ownerUser.id);
 
@@ -248,14 +240,12 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         ownerUser.id,
         {
           name: "Presets Get Own Restaurant",
-          max_covers: 30,
         },
       );
       const createdPreset = await orchestrator.createEventPreset(
         createdRestaurant.id,
         {
           name: "Noite de Fondue",
-          capacity: 25,
           event_times: ["19:30", "20:30", "21:30"]
         },
       );
@@ -265,12 +255,10 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         otherOwnerUser.id,
         {
           name: "Presets Get Other Restaurant",
-          max_covers: 30,
         },
       );
       await orchestrator.createEventPreset(otherRestaurant.id, {
         name: "Noite de Sushi",
-        capacity: 15,
         event_times: ["19:30", "20:30", "21:30"]
       });
 
@@ -291,7 +279,6 @@ describe("GET in `api/v1/restaurants/[restaurant]/event-presets`", () => {
         {
           id: createdPreset.id,
           name: "Noite de Fondue",
-          capacity: 25,
           event_times: ["19:30", "20:30", "21:30"],
           created_at: createdPreset.created_at.toISOString(),
           updated_at: createdPreset.updated_at.toISOString(),
