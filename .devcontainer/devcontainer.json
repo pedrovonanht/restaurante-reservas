@@ -8,5 +8,5 @@
       "moby": "true"
     }
   },
-  "postCreateCommand": "npm install -g npm@10.8.1 && npm install"
+  "postCreateCommand": "npm install -g npm@10.8.1 @anthropic-ai/claude-code && npm install"
 }
