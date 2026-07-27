@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { LogOut } from "lucide-react";
+import { ChevronRight, LogOut, Table2 } from "lucide-react";
 
 import { AppShell } from "components/layout/app-shell";
 import { Avatar } from "components/layout/avatar";
@@ -51,9 +52,15 @@ export default function ConfiguracoesPage() {
           </Card>
         ) : null}
 
-        <div className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-[13px] text-muted-foreground">
-          Mais opções em breve.
-        </div>
+        <Link href="/mesas">
+          <Card className="flex items-center gap-3 p-4 transition-colors hover:border-[oklch(0.72_0.06_258)]">
+            <Table2 className="size-5 text-muted-foreground" />
+            <span className="flex-1 text-[15px] font-semibold text-foreground">
+              Mesas
+            </span>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Card>
+        </Link>
 
         <Button
           variant="outline"

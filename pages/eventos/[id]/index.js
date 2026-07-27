@@ -13,7 +13,7 @@ import { Button } from "components/ui/button";
 import { useQuery } from "hooks/use-query";
 import { useTenant } from "context/tenant-context";
 import { events as eventsApi } from "lib/api";
-import { formatDayMonth, formatTime, occupancyPercent } from "lib/format";
+import { formatDayMonth, formatTime, tableOccupancyPercent } from "lib/format";
 import { cn } from "lib/utils";
 
 export default function EventoDetalhePage() {
@@ -43,10 +43,12 @@ export default function EventoDetalhePage() {
 
   const oc = data?.ocupation || {
     reservations: 0,
-    capacity: data?.capacity || 0,
+    total_capacity: 0,
     people: 0,
+    empty_tables: 0,
   };
-  const pct = occupancyPercent(oc);
+  const pct = tableOccupancyPercent(oc);
+  const totalTables = oc.reservations + oc.empty_tables;
 
   return (
     <AppShell>
@@ -91,9 +93,9 @@ export default function EventoDetalhePage() {
 
             <Card className="mt-3 p-4">
               <div className="flex items-center justify-between text-[13px]">
-                <span className="text-muted-foreground">Ocupação</span>
+                <span className="text-muted-foreground">Mesas ocupadas</span>
                 <span className="font-mono text-foreground">
-                  {oc.reservations}/{oc.capacity}
+                  {oc.reservations}/{totalTables}
                 </span>
               </div>
               <Progress value={pct} className="mt-2" />

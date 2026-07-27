@@ -17,7 +17,6 @@ export default function NovaPredefinicaoPage() {
   const { tenant } = useTenant();
 
   const [name, setName] = useState("");
-  const [capacity, setCapacity] = useState("");
   const [times, setTimes] = useState(["19:30", "20:30"]);
   const [fieldErrors, setFieldErrors] = useState({});
 
@@ -29,7 +28,6 @@ export default function NovaPredefinicaoPage() {
     e.preventDefault();
     const errors = validatePreset({
       name,
-      capacity,
       event_times: times,
     });
     setFieldErrors(errors);
@@ -38,7 +36,6 @@ export default function NovaPredefinicaoPage() {
     try {
       await mutate({
         name: name.trim(),
-        capacity: Number(capacity),
         event_times: times,
       });
       router.replace("/eventos");
@@ -71,26 +68,6 @@ export default function NovaPredefinicaoPage() {
           />
           {fieldErrors.name ? (
             <p className="text-[12px] text-destructive">{fieldErrors.name}</p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="capacity">Capacidade</Label>
-          <Input
-            id="capacity"
-            type="number"
-            inputMode="numeric"
-            min="1"
-            placeholder="90"
-            value={capacity}
-            onChange={(e) => setCapacity(e.target.value)}
-            className="font-mono"
-            aria-invalid={!!fieldErrors.capacity}
-          />
-          {fieldErrors.capacity ? (
-            <p className="text-[12px] text-destructive">
-              {fieldErrors.capacity}
-            </p>
           ) : null}
         </div>
 

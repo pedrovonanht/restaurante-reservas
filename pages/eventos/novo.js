@@ -36,7 +36,6 @@ export default function NovoEventoPage() {
 
   const [preset, setPreset] = useState("none");
   const [name, setName] = useState("");
-  const [capacity, setCapacity] = useState("");
   const [eventDate, setEventDate] = useState(todayISO());
   const [active, setActive] = useState(true);
   const [times, setTimes] = useState(["19:30", "20:30"]);
@@ -52,7 +51,6 @@ export default function NovoEventoPage() {
     const p = presets.find((x) => x.id === value);
     if (p) {
       setName(p.name);
-      setCapacity(p.capacity != null ? String(p.capacity) : "");
       if (p.event_times?.length) setTimes(p.event_times);
     }
   }
@@ -61,7 +59,6 @@ export default function NovoEventoPage() {
     e.preventDefault();
     const errors = validateEvent({
       name,
-      capacity,
       event_date: eventDate,
       event_times: times,
     });
@@ -74,7 +71,6 @@ export default function NovoEventoPage() {
       event_times: times,
       active,
     };
-    if (capacity !== "") input.capacity = Number(capacity);
     if (preset !== "none") input.preset_id = preset;
 
     try {
@@ -128,31 +124,6 @@ export default function NovoEventoPage() {
           />
           {fieldErrors.name ? (
             <p className="text-[12px] text-destructive">{fieldErrors.name}</p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="capacity">
-            Capacidade{" "}
-            <span className="font-normal text-muted-foreground">
-              (opcional)
-            </span>
-          </Label>
-          <Input
-            id="capacity"
-            type="number"
-            inputMode="numeric"
-            min="1"
-            placeholder="90"
-            value={capacity}
-            onChange={(e) => setCapacity(e.target.value)}
-            className="font-mono"
-            aria-invalid={!!fieldErrors.capacity}
-          />
-          {fieldErrors.capacity ? (
-            <p className="text-[12px] text-destructive">
-              {fieldErrors.capacity}
-            </p>
           ) : null}
         </div>
 

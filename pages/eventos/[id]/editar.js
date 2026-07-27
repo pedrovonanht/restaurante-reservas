@@ -42,7 +42,6 @@ export default function EditarEventoPage() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         name: data.name,
-        capacity: data.capacity != null ? String(data.capacity) : "",
         event_date: data.event_date,
         active: data.active,
         event_times: data.event_times,
@@ -72,7 +71,6 @@ export default function EditarEventoPage() {
       event_times: form.event_times,
       active: form.active,
     };
-    if (form.capacity !== "") input.capacity = Number(form.capacity);
 
     try {
       await mutate(input);
@@ -114,30 +112,6 @@ export default function EditarEventoPage() {
             />
             {fieldErrors.name ? (
               <p className="text-[12px] text-destructive">{fieldErrors.name}</p>
-            ) : null}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="capacity">
-              Capacidade{" "}
-              <span className="font-normal text-muted-foreground">
-                (opcional)
-              </span>
-            </Label>
-            <Input
-              id="capacity"
-              type="number"
-              inputMode="numeric"
-              min="1"
-              value={form.capacity}
-              onChange={(e) => update("capacity", e.target.value)}
-              className="font-mono"
-              aria-invalid={!!fieldErrors.capacity}
-            />
-            {fieldErrors.capacity ? (
-              <p className="text-[12px] text-destructive">
-                {fieldErrors.capacity}
-              </p>
             ) : null}
           </div>
 

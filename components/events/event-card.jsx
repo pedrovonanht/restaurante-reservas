@@ -3,17 +3,19 @@ import { CalendarDays } from "lucide-react";
 
 import { Card } from "components/ui/card";
 import { Progress } from "components/ui/progress";
-import { formatDayMonth, occupancyPercent } from "lib/format";
+import { formatDayMonth, tableOccupancyPercent } from "lib/format";
 import { cn } from "lib/utils";
 
 export function EventCard({ event, href }) {
   const closed = !event.active;
   const oc = event.ocupation || {
     reservations: 0,
-    capacity: event.capacity || 0,
+    total_capacity: 0,
     people: 0,
+    empty_tables: 0,
   };
-  const pct = occupancyPercent(oc);
+  const pct = tableOccupancyPercent(oc);
+  const totalTables = oc.reservations + oc.empty_tables;
 
   const inner = (
     <Card
@@ -46,9 +48,9 @@ export function EventCard({ event, href }) {
         <CalendarDays className="size-3.5" /> {formatDayMonth(event.event_date)}
       </p>
       <div className="mt-3 flex items-center justify-between text-[13px]">
-        <span className="text-muted-foreground">Reservas</span>
+        <span className="text-muted-foreground">Mesas ocupadas</span>
         <span className="font-mono text-foreground">
-          {oc.reservations}/{oc.capacity}
+          {oc.reservations}/{totalTables}
         </span>
       </div>
       <Progress

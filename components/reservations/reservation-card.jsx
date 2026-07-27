@@ -6,8 +6,14 @@ import { waLink } from "lib/whatsapp";
 import { cn } from "lib/utils";
 
 export function ReservationCard({ reservation, open, onToggle }) {
-  const { guest_name, party_size, guest_phone, reservation_time, event } =
-    reservation;
+  const {
+    guest_name,
+    party_size,
+    guest_phone,
+    reservation_time,
+    event,
+    table_name,
+  } = reservation;
   const dateLabel = event?.event_date ? formatDayMonth(event.event_date) : "";
   const timeLabel = formatTime(reservation_time);
   const wa = waLink(guest_phone);
@@ -44,10 +50,20 @@ export function ReservationCard({ reservation, open, onToggle }) {
 
       {open ? (
         <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
-          <span className="min-w-0 truncate text-[13px] text-muted-foreground">
-            evento:{" "}
-            <span className="text-foreground italic">{event?.name || "—"}</span>
-          </span>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="min-w-0 truncate text-[13px] text-muted-foreground">
+              evento:{" "}
+              <span className="text-foreground italic">
+                {event?.name || "—"}
+              </span>
+            </span>
+            {table_name ? (
+              <span className="min-w-0 truncate text-[13px] text-muted-foreground">
+                mesa:{" "}
+                <span className="text-foreground italic">{table_name}</span>
+              </span>
+            ) : null}
+          </div>
           {wa ? (
             <a
               href={wa}
