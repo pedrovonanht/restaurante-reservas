@@ -77,7 +77,7 @@ export default function ReservaEventoEspecificoPage() {
 
   return (
     <PublicShell
-      subtitle={`para a ${event.name} ${formatDayMonth(event.event_date)}`}
+      subtitle={`para ${event.name} ${formatDayMonth(event.event_date)}`}
     >
       {result ? (
         <ReservationSuccess reservation={result} restaurant={restaurant} />
