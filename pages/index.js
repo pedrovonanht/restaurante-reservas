@@ -15,6 +15,7 @@ import { useQuery } from "hooks/use-query";
 import { useTenant } from "context/tenant-context";
 import { reservations as reservationsApi } from "lib/api";
 import { resolveDateFilter, todayISO } from "lib/format";
+import { normalizePhone } from "lib/whatsapp";
 
 export default function HomePage() {
   const { tenant } = useTenant();
@@ -46,7 +47,13 @@ export default function HomePage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return sorted;
-    return sorted.filter((r) => r.guest_name?.toLowerCase().includes(q));
+    const qDigits = normalizePhone(query);
+    return sorted.filter((r) => {
+      if (r.guest_name?.toLowerCase().includes(q)) return true;
+      if (r.table_name?.toLowerCase().includes(q)) return true;
+      if (qDigits && normalizePhone(r.guest_phone).includes(qDigits)) return true;
+      return false;
+    });
   }, [sorted, query]);
 
   // Primeiro card aberto por padrão (um aberto por vez). `undefined` = usar o primeiro.
@@ -89,9 +96,9 @@ export default function HomePage() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por nome"
+            placeholder="Buscar por nome, mesa ou telefone"
             className="pl-9"
-            aria-label="Buscar reservas por nome"
+            aria-label="Buscar reservas por nome, mesa ou telefone"
           />
         </div>
 
@@ -111,7 +118,7 @@ export default function HomePage() {
               }
               description={
                 query
-                  ? "Tente buscar por outro nome."
+                  ? "Tente buscar por outro nome, mesa ou telefone."
                   : "As reservas desse período aparecerão aqui."
               }
             />
