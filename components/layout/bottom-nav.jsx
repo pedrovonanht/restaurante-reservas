@@ -26,7 +26,7 @@ export function BottomNav() {
   const { pathname } = useRouter();
 
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-3 border-t border-border bg-[oklch(0.99_0.003_262)] px-3 pt-2.5 pb-[max(22px,env(safe-area-inset-bottom))]">
+    <nav className="sticky bottom-0 z-20 grid grid-cols-3 border-t border-border bg-surface-alt px-3 pt-2.5 pb-[max(22px,env(safe-area-inset-bottom))]">
       {ITEMS.map(({ href, label, icon: Icon, isActive }) => {
         const active = isActive(pathname);
         return (

@@ -47,11 +47,7 @@ export default function NovaMesaPage() {
 
   return (
     <AppShell>
-      <BackHeader
-        title="Criar mesa"
-        titleClassName="text-[17px]"
-        fallbackHref="/mesas"
-      />
+      <BackHeader title="Criar mesa" fallbackHref="/mesas" />
 
       <form
         onSubmit={onSubmit}
@@ -82,7 +78,7 @@ export default function NovaMesaPage() {
             placeholder="4"
             value={maxCapacity}
             onChange={(e) => setMaxCapacity(e.target.value)}
-            className="font-mono"
+            className="font-display"
             aria-invalid={!!fieldErrors.max_capacity}
           />
           {fieldErrors.max_capacity ? (
@@ -107,7 +103,7 @@ export default function NovaMesaPage() {
             placeholder="1"
             value={minCapacity}
             onChange={(e) => setMinCapacity(e.target.value)}
-            className="font-mono"
+            className="font-display"
             aria-invalid={!!fieldErrors.min_capacity}
           />
           {fieldErrors.min_capacity ? (
@@ -118,14 +114,14 @@ export default function NovaMesaPage() {
         </div>
 
         {error ? (
-          <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
             {error.message}
           </div>
         ) : null}
 
         <Button
           type="submit"
-          className="mt-1 h-[50px] w-full rounded-xl text-[15px] font-bold hover:bg-primary/90"
+          className="mt-1 h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
           disabled={loading}
         >
           {loading ? "Criando…" : "Criar mesa"}

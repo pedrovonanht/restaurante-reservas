@@ -93,7 +93,7 @@ export function ReservationForm({
           placeholder="2"
           value={partySize}
           onChange={(e) => setPartySize(e.target.value)}
-          className="font-mono"
+          className="font-display"
           aria-invalid={!!fieldErrors.party_size}
         />
         {fieldErrors.party_size ? (
@@ -112,10 +112,10 @@ export function ReservationForm({
               type="button"
               onClick={() => setSelectedTime(t)}
               className={cn(
-                "rounded-full border px-4 py-2 font-mono text-[14px] transition-colors",
+                "rounded-md border px-4 py-2 font-display text-[14px] font-medium transition-colors",
                 t === reservationTime
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-sunken text-foreground hover:border-primary/50",
+                  : "border-border bg-card text-foreground hover:border-primary/50",
               )}
             >
               {formatTime(t)}
@@ -130,7 +130,7 @@ export function ReservationForm({
       </div>
 
       {error ? (
-        <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+        <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
           <p>{error.message}</p>
           {error.action ? (
             <p className="mt-0.5 text-destructive/80">{error.action}</p>
@@ -140,7 +140,7 @@ export function ReservationForm({
 
       <Button
         type="submit"
-        className="mt-1 h-[52px] w-full rounded-xl text-[15px] font-bold tracking-[0.02em] uppercase hover:bg-primary/90"
+        className="mt-1 h-[52px] w-full rounded-lg text-[15px] font-bold tracking-[0.02em] uppercase hover:bg-primary/90"
         disabled={submitting}
       >
         {submitting ? "Enviando…" : "Enviar"}

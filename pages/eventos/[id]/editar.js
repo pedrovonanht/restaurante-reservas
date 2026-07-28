@@ -82,11 +82,7 @@ export default function EditarEventoPage() {
 
   return (
     <AppShell>
-      <BackHeader
-        title="Editar evento"
-        titleClassName="text-[17px]"
-        fallbackHref={`/eventos/${id}`}
-      />
+      <BackHeader title="Editar evento" fallbackHref={`/eventos/${id}`} />
 
       {!ready || loading || !form ? (
         <div className="flex flex-1 items-center justify-center py-16">
@@ -123,7 +119,7 @@ export default function EditarEventoPage() {
               value={form.event_date}
               min={todayISO()}
               onChange={(e) => update("event_date", e.target.value)}
-              className="font-mono"
+              className="font-display"
               aria-invalid={!!fieldErrors.event_date}
             />
             {fieldErrors.event_date ? (
@@ -133,9 +129,15 @@ export default function EditarEventoPage() {
             ) : null}
           </div>
 
-          <Card className="flex items-center justify-between gap-3 p-3.5">
+          <Card
+            className={
+              form.active
+                ? "flex items-center justify-between gap-3 border-success/40 bg-success-tint p-3.5"
+                : "flex items-center justify-between gap-3 p-3.5"
+            }
+          >
             <label htmlFor="event-active" className="flex-1 cursor-pointer">
-              <span className="block text-[15px] font-semibold text-foreground">
+              <span className="block text-[15px] font-bold text-foreground">
                 Evento ativo
               </span>
               <span className="block text-[13px] text-muted-foreground">
@@ -159,14 +161,14 @@ export default function EditarEventoPage() {
           </div>
 
           {saveError ? (
-            <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+            <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
               {saveError.message}
             </div>
           ) : null}
 
           <Button
             type="submit"
-            className="mt-1 h-[50px] w-full rounded-xl text-[15px] font-bold hover:bg-primary/90"
+            className="mt-1 h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
             disabled={saving}
           >
             {saving ? "Salvando…" : "Salvar alterações"}

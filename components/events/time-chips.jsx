@@ -38,7 +38,7 @@ export function TimeChips({ value = [], onChange, error }) {
           {value.map((time, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-sunken py-1.5 pr-1.5 pl-3"
+              className="inline-flex items-center gap-1.5 rounded-md bg-accent-soft py-1.5 pr-1.5 pl-3"
             >
               <input
                 type="text"
@@ -47,13 +47,13 @@ export function TimeChips({ value = [], onChange, error }) {
                 value={time}
                 onChange={(e) => update(idx, e.target.value)}
                 aria-label={`Horário ${idx + 1}`}
-                className="w-[46px] bg-transparent font-mono text-[13px] text-foreground outline-none"
+                className="w-[46px] bg-transparent font-display text-[13px] font-medium text-primary outline-none"
               />
               <button
                 type="button"
                 onClick={() => remove(idx)}
                 aria-label="Remover horário"
-                className="flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-[oklch(0.95_0.05_25)] hover:text-[oklch(0.5_0.18_25)]"
+                className="flex size-5 items-center justify-center rounded-full text-primary/70 transition-colors hover:bg-primary/10 hover:text-primary"
               >
                 <X className="size-3.5" />
               </button>
@@ -63,7 +63,7 @@ export function TimeChips({ value = [], onChange, error }) {
       ) : null}
 
       {draft !== null ? (
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-sunken px-3 py-2">
+        <div className="flex items-center gap-2 rounded-lg border border-input bg-card px-3 py-2">
           <input
             type="text"
             inputMode="numeric"
@@ -79,7 +79,7 @@ export function TimeChips({ value = [], onChange, error }) {
               }
               if (e.key === "Escape") setDraft(null);
             }}
-            className="flex-1 bg-transparent font-mono text-[13px] text-foreground outline-none"
+            className="flex-1 bg-transparent font-display text-[13px] text-foreground outline-none"
           />
           <button
             type="button"
@@ -102,7 +102,7 @@ export function TimeChips({ value = [], onChange, error }) {
         <button
           type="button"
           onClick={() => setDraft("19:30")}
-          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[oklch(0.8_0.02_262)] py-2.5 text-[13px] font-semibold text-ink-soft transition-colors hover:border-primary hover:text-primary"
+          className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2.5 text-[13px] font-semibold text-ink-soft transition-colors hover:border-primary hover:text-primary"
         >
           <Plus className="size-4" /> Adicionar horário
         </button>

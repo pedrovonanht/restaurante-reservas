@@ -132,11 +132,7 @@ export default function EditarMesaPage() {
 
   return (
     <AppShell>
-      <BackHeader
-        title="Editar mesa"
-        titleClassName="text-[17px]"
-        fallbackHref="/mesas"
-      />
+      <BackHeader title="Editar mesa" fallbackHref="/mesas" />
 
       {!ready || loading || !form ? (
         <div className="flex flex-1 items-center justify-center py-16">
@@ -174,7 +170,7 @@ export default function EditarMesaPage() {
               min="1"
               value={form.max_capacity}
               onChange={(e) => update("max_capacity", e.target.value)}
-              className="font-mono"
+              className="font-display"
               aria-invalid={!!fieldErrors.max_capacity}
             />
             {fieldErrors.max_capacity ? (
@@ -198,7 +194,7 @@ export default function EditarMesaPage() {
               min="1"
               value={form.min_capacity}
               onChange={(e) => update("min_capacity", e.target.value)}
-              className="font-mono"
+              className="font-display"
               aria-invalid={!!fieldErrors.min_capacity}
             />
             {fieldErrors.min_capacity ? (
@@ -209,14 +205,14 @@ export default function EditarMesaPage() {
           </div>
 
           {saveError ? (
-            <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+            <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
               {saveError.message}
             </div>
           ) : null}
 
           <Button
             type="submit"
-            className="mt-1 h-[50px] w-full rounded-xl text-[15px] font-bold hover:bg-primary/90"
+            className="mt-1 h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
             disabled={saving}
           >
             {saving ? "Salvando…" : "Salvar alterações"}
@@ -244,7 +240,7 @@ export default function EditarMesaPage() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               {deactivateError ? (
-                <div className="mt-3 rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+                <div className="mt-3 rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
                   {deactivateError.message}
                 </div>
               ) : null}

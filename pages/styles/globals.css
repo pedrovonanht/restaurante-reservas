@@ -5,12 +5,22 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
+  --font-display: var(--font-display);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  /* Sem fonte mono no DS: os pontos numéricos usam a display (Space Grotesk). */
+  --font-mono: var(--font-display);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-tint: var(--success-tint);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-tint: var(--warning-tint);
+  --color-danger-tint: var(--danger-tint);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-foreground: var(--accent-soft-foreground);
+  --color-surface-alt: var(--surface-alt);
+  --color-border-soft: var(--border-soft);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-canvas: var(--canvas);
@@ -46,59 +56,77 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Raio · DS: chips 6px · botões/inputs/cartões 8px · folhas/modais 12px. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+  --radius-4xl: 999px;
+  /* Elevação · DS: quase nenhuma sombra. */
+  --shadow-card: 0 1px 2px 0 rgb(22 32 58 / 0.04);
+  --shadow-sheet: 0 12px 32px -12px rgb(22 32 58 / 0.28);
 }
 
 :root {
-  /* Painel de Reservas — paleta do handoff (oklch), mapeada nas variáveis shadcn */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.24 0.02 262); /* ink */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.02 262);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.02 262);
-  --primary: oklch(0.55 0.17 258);
-  --primary-foreground: oklch(0.98 0.02 258);
-  --secondary: oklch(0.985 0.003 262); /* sunken */
-  --secondary-foreground: oklch(0.24 0.02 262);
-  --muted: oklch(0.985 0.003 262);
-  --muted-foreground: oklch(0.55 0.02 262);
-  --accent: oklch(0.985 0.003 262);
-  --accent-foreground: oklch(0.24 0.02 262);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.008 262); /* line */
-  --input: oklch(0.9 0.008 262);
-  --ring: oklch(0.55 0.17 258); /* primary */
+  /* ==== Design System "Tablefy" — fundo quente, ação azul, estado verde ==== */
+  /* BASE */
+  --background: #fbf7ef; /* superfície alt. — coluna quente do app */
+  --canvas: #f5f0e6; /* areia · fundo (wrapper externo) */
+  --surface-alt: #fbf7ef;
+  --card: #ffffff; /* superfície */
+  --card-foreground: #16203a;
+  --popover: #ffffff;
+  --popover-foreground: #16203a;
+  --sunken: #f5f0e6;
+  --border: #e6dfd0; /* borda */
+  --border-soft: #efe8da; /* borda suave */
+  --input: #e6dfd0;
 
-  /* Tokens extras do handoff */
-  --success: oklch(0.58 0.13 155);
-  --success-foreground: oklch(0.98 0.02 155);
-  --success-tint: oklch(0.98 0.02 155);
-  --ink: oklch(0.24 0.02 262);
-  --ink-soft: oklch(0.35 0.02 262);
-  --canvas: oklch(0.955 0.006 262);
-  --sunken: oklch(0.985 0.003 262);
+  /* TEXTO */
+  --foreground: #16203a; /* tinta · títulos (ink) */
+  --ink: #16203a;
+  --ink-soft: #4e4a43; /* corpo */
+  --muted: #f5f0e6;
+  --muted-foreground: #6e6a61; /* metadado */
 
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* AÇÃO E ESTADO */
+  --primary: #1b3a8f; /* azul-noite · ação */
+  --primary-foreground: #ffffff;
+  --accent-soft: #e5e9f4; /* azul suave */
+  --accent-soft-foreground: #1b3a8f;
+  --secondary: #e5e9f4; /* botão "Suave" = azul suave */
+  --secondary-foreground: #1b3a8f;
+  --accent: #efe8da; /* hover neutro (borda suave) */
+  --accent-foreground: #16203a;
+  --ring: #1b3a8f;
+
+  --success: #1f6a4f; /* verde · sucesso */
+  --success-foreground: #ffffff;
+  --success-tint: #e3efe7; /* verde suave */
+
+  --warning: #a9631a; /* âmbar · atenção */
+  --warning-foreground: #ffffff;
+  --warning-tint: #f7ebdb; /* âmbar suave */
+
+  --destructive: #a32b22; /* vermelho · destrutivo */
+  --danger-tint: #f7e2e0; /* vermelho suave */
+
+  --chart-1: #1b3a8f;
+  --chart-2: #1f6a4f;
+  --chart-3: #a9631a;
+  --chart-4: #4e4a43;
+  --chart-5: #8c877c;
+  --radius: 0.5rem; /* 8px base */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #16203a;
+  --sidebar-primary: #1b3a8f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f0e6;
+  --sidebar-accent-foreground: #16203a;
+  --sidebar-border: #e6dfd0;
+  --sidebar-ring: #1b3a8f;
 }
 
 .dark {

@@ -46,11 +46,7 @@ export default function NovaPredefinicaoPage() {
 
   return (
     <AppShell>
-      <BackHeader
-        title="Criar predefinição"
-        titleClassName="text-[17px]"
-        fallbackHref="/eventos"
-      />
+      <BackHeader title="Criar predefinição" fallbackHref="/eventos" />
 
       <form
         onSubmit={onSubmit}
@@ -81,14 +77,14 @@ export default function NovaPredefinicaoPage() {
         </div>
 
         {error ? (
-          <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
             {error.message}
           </div>
         ) : null}
 
         <Button
           type="submit"
-          className="mt-1 h-[50px] w-full rounded-xl text-[15px] font-bold hover:bg-primary/90"
+          className="mt-1 h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
           disabled={loading}
         >
           {loading ? "Criando…" : "Criar predefinição"}

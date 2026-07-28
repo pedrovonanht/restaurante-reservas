@@ -12,9 +12,11 @@ export function ErrorState({ error, onRetry, className }) {
         className,
       )}
     >
-      <AlertCircle className="size-8 text-muted-foreground" />
+      <span className="flex size-12 items-center justify-center rounded-xl bg-danger-tint text-destructive">
+        <AlertCircle className="size-6" />
+      </span>
       <div className="space-y-1">
-        <p className="text-[15px] font-semibold text-foreground">
+        <p className="font-display text-[16px] font-bold text-foreground">
           {error?.message || "Algo deu errado."}
         </p>
         {error?.action ? (
@@ -44,9 +46,13 @@ export function EmptyState({
         className,
       )}
     >
-      <Icon className="size-8 text-muted-foreground" />
+      <span className="flex size-12 items-center justify-center rounded-xl bg-accent-soft text-primary">
+        <Icon className="size-6" />
+      </span>
       <div className="space-y-1">
-        <p className="text-[15px] font-semibold text-foreground">{title}</p>
+        <p className="font-display text-[16px] font-bold text-foreground">
+          {title}
+        </p>
         {description ? (
           <p className="text-[13px] text-muted-foreground">{description}</p>
         ) : null}
@@ -60,7 +66,7 @@ export function CardListSkeleton({ count = 3, className }) {
   return (
     <div className={cn("flex flex-col gap-2.5", className)}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-xl border border-border bg-card p-3.5">
+        <div key={i} className="rounded-lg border border-border bg-card p-3.5">
           <div className="flex items-center justify-between">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-16" />

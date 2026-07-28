@@ -71,7 +71,7 @@ export default function EventosPage() {
         ) : (
           groups.map((group) => (
             <div key={group.key} className="flex flex-col gap-2.5">
-              <p className="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+              <p className="text-[11px] font-extrabold tracking-[0.14em] text-muted-foreground uppercase">
                 {group.label}
               </p>
               {group.items.map((ev) => (
@@ -84,7 +84,7 @@ export default function EventosPage() {
         <div className="mt-2 flex flex-col items-center gap-3">
           <Button
             asChild
-            className="h-12 w-full rounded-xl text-[15px] font-semibold hover:bg-primary/90"
+            className="h-12 w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
           >
             <Link href="/eventos/novo">
               <Plus className="size-4" /> Novo evento

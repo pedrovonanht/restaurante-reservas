@@ -3,9 +3,13 @@
 // identidade visual de nenhum restaurante). O mesmo mecanismo do dark mode
 // (`.dark { --primary: ... }` em globals.css) garante que a cascata funcione.
 export const NEUTRAL_VARS = {
-  "--primary": "oklch(0.24 0.02 262)",
-  "--primary-foreground": "oklch(0.98 0.003 262)",
-  "--ring": "oklch(0.24 0.02 262)",
+  "--primary": "#16203a",
+  "--primary-foreground": "#ffffff",
+  "--secondary": "#efe8da",
+  "--secondary-foreground": "#16203a",
+  "--accent-soft": "#efe8da",
+  "--accent-soft-foreground": "#16203a",
+  "--ring": "#16203a",
 };
 
 // Container central (mobile-first) para as páginas públicas de reserva do convidado.
@@ -22,7 +26,7 @@ export function PublicShell({
     >
       <div className="flex min-h-[100dvh] w-full max-w-[430px] flex-col bg-background">
         <header className="px-6 pt-10 pb-2 text-center">
-          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+          <h1 className="font-display text-2xl font-bold tracking-[-0.02em] text-foreground">
             {title}
           </h1>
           {subtitle ? (

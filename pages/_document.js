@@ -1,10 +1,13 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
-import { fontSans, fontMono } from "lib/fonts";
+import { fontSans, fontDisplay } from "lib/fonts";
 
 export default function Document() {
   return (
-    <Html lang="pt-BR" className={`${fontSans.variable} ${fontMono.variable}`}>
+    <Html
+      lang="pt-BR"
+      className={`${fontSans.variable} ${fontDisplay.variable}`}
+    >
       <Head />
       <body>
         <Main />

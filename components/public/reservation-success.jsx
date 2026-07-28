@@ -15,7 +15,7 @@ export function ReservationSuccess({ reservation, restaurant }) {
         <Check className="size-7" />
       </span>
       <div>
-        <h2 className="text-lg font-bold text-foreground">
+        <h2 className="font-display text-lg font-bold tracking-[-0.02em] text-foreground">
           Reserva confirmada
         </h2>
         <p className="mt-1 text-[13px] text-muted-foreground">
@@ -33,19 +33,19 @@ export function ReservationSuccess({ reservation, restaurant }) {
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Data</dt>
-            <dd className="font-mono text-foreground">
+            <dd className="font-display font-medium text-foreground">
               {formatDayMonth(reservation.reservation_date)}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Horário</dt>
-            <dd className="font-mono text-foreground">
+            <dd className="font-display font-medium text-foreground">
               {formatTime(reservation.reservation_time)}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted-foreground">Pessoas</dt>
-            <dd className="font-mono text-foreground">
+            <dd className="font-display font-medium text-foreground">
               {reservation.party_size}
             </dd>
           </div>

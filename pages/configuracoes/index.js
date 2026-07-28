@@ -22,7 +22,9 @@ export default function ConfiguracoesPage() {
   return (
     <AppShell requireTenant={false}>
       <header className="sticky top-0 z-10 border-b border-border bg-background px-5 py-3">
-        <h1 className="text-[17px] font-bold text-foreground">Configurações</h1>
+        <h1 className="font-display text-[20px] font-bold tracking-[-0.02em] text-foreground">
+          Configurações
+        </h1>
       </header>
 
       <section className="flex flex-col gap-4 px-5 py-4">
@@ -46,14 +48,12 @@ export default function ConfiguracoesPage() {
             <p className="mt-0.5 text-[15px] font-semibold text-foreground">
               {current.name}
             </p>
-            <p className="font-mono text-[12px] text-muted-foreground">
-              {current.slug}
-            </p>
+            <p className="text-[12px] text-muted-foreground">{current.slug}</p>
           </Card>
         ) : null}
 
         <Link href="/mesas">
-          <Card className="flex items-center gap-3 p-4 transition-colors hover:border-[oklch(0.72_0.06_258)]">
+          <Card className="flex items-center gap-3 p-4 transition-colors hover:border-primary/40">
             <Table2 className="size-5 text-muted-foreground" />
             <span className="flex-1 text-[15px] font-semibold text-foreground">
               Mesas

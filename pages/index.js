@@ -75,9 +75,9 @@ export default function HomePage() {
           />
           <TenantSwitcher />
         </div>
-        <h1 className="mt-4 text-[34px] leading-none font-extrabold tracking-tight text-ink">
+        <h1 className="mt-4 font-display text-[34px] leading-none font-bold tracking-[-0.03em] text-ink">
           {loading ? "—" : list.length}{" "}
-          <span className="text-[oklch(0.45_0.02_262)]">
+          <span className="text-foreground">
             {list.length === 1 ? "reserva" : "reservas"}
           </span>
         </h1>
@@ -90,13 +90,13 @@ export default function HomePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nome"
-            className="border-transparent bg-sunken pl-9"
+            className="pl-9"
             aria-label="Buscar reservas por nome"
           />
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <p className="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+          <p className="text-[11px] font-extrabold tracking-[0.14em] text-muted-foreground uppercase">
             Reservas recentes
           </p>
 

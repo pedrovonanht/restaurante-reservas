@@ -38,15 +38,11 @@ export default function MesasPage() {
 
   return (
     <AppShell>
-      <BackHeader
-        title="Mesas"
-        titleClassName="text-[17px]"
-        fallbackHref="/configuracoes"
-      />
+      <BackHeader title="Mesas" fallbackHref="/configuracoes" />
 
       <section className="flex flex-col gap-4 px-5 py-4">
         <div>
-          <h1 className="text-[22px] font-bold text-foreground">
+          <h1 className="font-display text-[22px] font-bold tracking-[-0.02em] text-foreground">
             Minhas mesas
           </h1>
           {tables.length > 0 ? (
@@ -84,7 +80,7 @@ export default function MesasPage() {
 
         <Button
           asChild
-          className="mt-2 h-12 w-full rounded-xl text-[15px] font-semibold hover:bg-primary/90"
+          className="mt-2 h-12 w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
         >
           <Link href="/mesas/novo">
             <Plus className="size-4" /> Nova mesa

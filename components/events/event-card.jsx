@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 
 import { Card } from "components/ui/card";
+import { Badge } from "components/ui/badge";
 import { Progress } from "components/ui/progress";
 import { formatDayMonth, tableOccupancyPercent } from "lib/format";
 import { cn } from "lib/utils";
@@ -22,41 +23,36 @@ export function EventCard({ event, href }) {
       className={cn(
         "p-3.5 transition-colors",
         closed
-          ? "border-[oklch(0.92_0.008_262)] bg-[oklch(0.975_0.004_262)]"
-          : "hover:border-[oklch(0.72_0.06_258)]",
+          ? "border-border-soft bg-surface-alt"
+          : "hover:border-primary/40",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <h3
           className={cn(
-            "text-base font-semibold",
-            closed ? "text-[oklch(0.5_0.02_262)]" : "text-foreground",
+            "font-display text-base font-bold",
+            closed ? "text-muted-foreground" : "text-foreground",
           )}
         >
           {event.name}
         </h3>
-        <span
-          className={cn(
-            "shrink-0 text-[12px] font-semibold",
-            closed ? "text-muted-foreground" : "text-success",
-          )}
-        >
+        <Badge variant={closed ? "warning" : "success"} className="shrink-0">
           {closed ? "encerrada" : "ativa"}
-        </span>
+        </Badge>
       </div>
-      <p className="mt-1 flex items-center gap-1 font-mono text-[12px] text-muted-foreground">
+      <p className="mt-1 flex items-center gap-1 text-[12px] font-medium text-muted-foreground">
         <CalendarDays className="size-3.5" /> {formatDayMonth(event.event_date)}
       </p>
       <div className="mt-3 flex items-center justify-between text-[13px]">
         <span className="text-muted-foreground">Mesas ocupadas</span>
-        <span className="font-mono text-foreground">
+        <span className="font-display text-foreground">
           {oc.reservations}/{totalTables}
         </span>
       </div>
       <Progress
         value={pct}
         className="mt-1.5"
-        indicatorClassName={closed ? "bg-[oklch(0.78_0.02_262)]" : undefined}
+        indicatorClassName={closed ? "bg-muted-foreground/40" : undefined}
       />
     </Card>
   );

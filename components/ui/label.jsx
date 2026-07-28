@@ -8,7 +8,7 @@ function Label({ className, ...props }) {
     <LabelPrimitive.Root
       data-slot="label"
       className={cn(
-        "flex items-center gap-1 text-[13px] font-semibold text-ink-soft select-none",
+        "flex items-center gap-1 text-[14px] font-extrabold text-foreground select-none",
         "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
         className,
       )}

@@ -110,14 +110,14 @@ export default function RegisterPage() {
         </div>
 
         {submitError ? (
-          <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
             {submitError.message}
           </div>
         ) : null}
 
         <Button
           type="submit"
-          className="h-[50px] w-full rounded-xl text-[15px] font-semibold hover:bg-primary/90"
+          className="h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
           disabled={submitting}
         >
           {submitting ? "Criando conta…" : "Criar conta"}
