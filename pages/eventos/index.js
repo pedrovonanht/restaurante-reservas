@@ -15,7 +15,7 @@ import { Button } from "components/ui/button";
 import { useQuery } from "hooks/use-query";
 import { useTenant } from "context/tenant-context";
 import { useAuth } from "context/auth-context";
-import { events as eventsApi } from "lib/api";
+import { events as eventsApi, tables as tablesApi } from "lib/api";
 import { monthKey, monthLabel } from "lib/format";
 
 export default function EventosPage() {
@@ -26,6 +26,12 @@ export default function EventosPage() {
     [tenant],
     { enabled: !!tenant },
   );
+  const {
+    data: tablesData,
+    loading: tablesLoading,
+    error: tablesError,
+  } = useQuery(() => tablesApi.list(tenant), [tenant], { enabled: !!tenant });
+  const tables = tablesData || [];
 
   const groups = useMemo(() => {
     const events = data || [];
@@ -54,6 +60,19 @@ export default function EventosPage() {
       </header>
 
       <section className="flex flex-col gap-4 px-5 py-4">
+        {!tablesLoading && !tablesError && tables.length === 0 ? (
+          <div className="rounded-lg border border-primary/30 bg-accent-soft px-3 py-2.5 text-[13px] text-foreground">
+            Para começar a receber reservas,{" "}
+            <Link
+              href="/mesas/novo"
+              className="font-semibold text-primary underline underline-offset-2"
+            >
+              crie uma mesa
+            </Link>
+            .
+          </div>
+        ) : null}
+
         {loading ? (
           <CardListSkeleton count={4} />
         ) : error ? (
