@@ -8,6 +8,8 @@ const PRESETS = [
   { mode: "today", label: "Hoje" },
   { mode: "week", label: "Esta semana" },
   { mode: "month", label: "Este mês" },
+  { mode: "next30", label: "Próximos 30 dias" },
+  { mode: "all", label: "Todas" },
 ];
 
 // Filtro de período das reservas: atalhos (hoje/semana/mês) + escolha de uma

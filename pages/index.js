@@ -19,7 +19,7 @@ import { resolveDateFilter, todayISO } from "lib/format";
 export default function HomePage() {
   const { tenant } = useTenant();
 
-  const [filterMode, setFilterMode] = useState("month");
+  const [filterMode, setFilterMode] = useState("next30");
   const [customDate, setCustomDate] = useState(todayISO());
   const { from, to, label } = useMemo(
     () => resolveDateFilter(filterMode, customDate),
