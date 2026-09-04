@@ -19,11 +19,11 @@ function FullScreenLoader() {
 function NoRestaurantLocked() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 px-5 py-10 text-center">
-      <span className="flex size-14 items-center justify-center rounded-full bg-[oklch(0.93_0.02_258)] text-primary">
+      <span className="flex size-14 items-center justify-center rounded-full bg-accent-soft text-primary">
         <Lock className="size-6" />
       </span>
       <div className="space-y-1">
-        <h1 className="text-lg font-bold text-foreground">
+        <h1 className="font-display text-lg font-bold text-foreground">
           Produto em fase de testes
         </h1>
         <p className="text-[13px] text-muted-foreground">

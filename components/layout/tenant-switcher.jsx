@@ -36,17 +36,15 @@ export function TenantSwitcher({ triggerClassName }) {
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between gap-3 border-b border-[oklch(0.94_0.008_262)] px-4 py-3 text-left transition-colors last:border-b-0",
-                    selected
-                      ? "bg-[oklch(0.98_0.008_258)]"
-                      : "hover:bg-[oklch(0.97_0.006_262)]",
+                    "flex w-full items-center justify-between gap-3 border-b border-border-soft px-4 py-3 text-left transition-colors last:border-b-0",
+                    selected ? "bg-accent-soft" : "hover:bg-accent",
                   )}
                 >
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold text-foreground">
                       {r.name}
                     </span>
-                    <span className="block truncate font-mono text-[11px] text-muted-foreground">
+                    <span className="block truncate font-display text-[11px] text-muted-foreground">
                       {r.slug}
                     </span>
                   </span>
@@ -54,8 +52,8 @@ export function TenantSwitcher({ triggerClassName }) {
                     className={cn(
                       "flex size-[22px] shrink-0 items-center justify-center rounded-md border",
                       selected
-                        ? "border-primary bg-primary text-white"
-                        : "border-[oklch(0.85_0.01_262)] bg-white",
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card",
                     )}
                   >
                     {selected ? <Check className="size-3.5" /> : null}
@@ -65,7 +63,7 @@ export function TenantSwitcher({ triggerClassName }) {
             );
           })}
         </ul>
-        <div className="flex items-center justify-center gap-2 border-t border-[oklch(0.94_0.008_262)] px-4 py-3 text-[12px] text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 border-t border-border-soft px-4 py-3 text-[12px] text-muted-foreground">
           <Lock className="size-3.5" /> Adicionar Restaurante
         </div>
       </PopoverContent>

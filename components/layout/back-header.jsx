@@ -29,7 +29,12 @@ export function BackHeader({
         aria-label="Voltar"
       >
         <ArrowLeft className="size-5 shrink-0" />
-        <span className={cn("truncate font-semibold", titleClassName)}>
+        <span
+          className={cn(
+            "truncate font-display text-[20px] font-bold tracking-[-0.02em]",
+            titleClassName,
+          )}
+        >
           {title}
         </span>
       </button>

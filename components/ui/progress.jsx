@@ -13,7 +13,7 @@ function Progress({ value = 0, className, indicatorClassName, ...props }) {
       aria-valuemin={0}
       aria-valuemax={100}
       className={cn(
-        "h-2 w-full overflow-hidden rounded-full bg-[oklch(0.93_0.008_262)]",
+        "h-2 w-full overflow-hidden rounded-full bg-border-soft",
         className,
       )}
       {...props}
@@ -21,7 +21,7 @@ function Progress({ value = 0, className, indicatorClassName, ...props }) {
       <div
         data-slot="progress-indicator"
         className={cn(
-          "h-full rounded-full bg-primary transition-[width]",
+          "h-full rounded-full bg-success transition-[width]",
           indicatorClassName,
         )}
         style={{ width: `${pct}%` }}

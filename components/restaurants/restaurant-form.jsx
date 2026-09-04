@@ -14,20 +14,16 @@ export function RestaurantForm({
   submitLabel = "Criar restaurante",
 }) {
   const [name, setName] = useState("");
-  const [maxCovers, setMaxCovers] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const { mutate, loading, error } = useMutation(restaurantsApi.create);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const errors = validateRestaurant({ name, max_covers: maxCovers });
+    const errors = validateRestaurant({ name });
     setFieldErrors(errors);
     if (hasErrors(errors)) return;
     try {
-      const created = await mutate({
-        name: name.trim(),
-        max_covers: Number(maxCovers),
-      });
+      const created = await mutate({ name: name.trim() });
       onCreated?.(created);
     } catch {
       /* erro exibido abaixo via `error` */
@@ -46,22 +42,6 @@ export function RestaurantForm({
         />
         {fieldErrors.name ? (
           <p className="text-[12px] text-destructive">{fieldErrors.name}</p>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-1">
-        <Input
-          type="number"
-          inputMode="numeric"
-          min="1"
-          placeholder="Capacidade (lugares)"
-          value={maxCovers}
-          onChange={(e) => setMaxCovers(e.target.value)}
-          aria-invalid={!!fieldErrors.max_covers}
-        />
-        {fieldErrors.max_covers ? (
-          <p className="text-[12px] text-destructive">
-            {fieldErrors.max_covers}
-          </p>
         ) : null}
       </div>
       {error ? (

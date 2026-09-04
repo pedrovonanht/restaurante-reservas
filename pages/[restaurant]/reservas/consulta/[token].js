@@ -40,13 +40,15 @@ export default function ConsultaReservaPage() {
             </div>
             <div className="flex items-center justify-between gap-3">
               <dt className="text-muted-foreground">Horário</dt>
-              <dd className="font-mono text-foreground">
+              <dd className="font-display font-medium text-foreground">
                 {formatTime(data.reservation_time)}
               </dd>
             </div>
             <div className="flex items-center justify-between gap-3">
               <dt className="text-muted-foreground">Pessoas</dt>
-              <dd className="font-mono text-foreground">{data.party_size}</dd>
+              <dd className="font-display font-medium text-foreground">
+                {data.party_size}
+              </dd>
             </div>
           </dl>
         </Card>

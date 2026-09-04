@@ -8,6 +8,8 @@ const PRESETS = [
   { mode: "today", label: "Hoje" },
   { mode: "week", label: "Esta semana" },
   { mode: "month", label: "Este mês" },
+  { mode: "next30", label: "Próximos 30 dias" },
+  { mode: "all", label: "Todas" },
 ];
 
 // Filtro de período das reservas: atalhos (hoje/semana/mês) + escolha de uma
@@ -23,8 +25,8 @@ export function ReservationsDateFilter({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[13px] font-medium text-foreground outline-none">
-        <CalendarDays className="size-3.5 text-muted-foreground" />
+      <PopoverTrigger className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground outline-none">
+        <CalendarDays className="size-3.5" />
         {label}
       </PopoverTrigger>
 
@@ -41,7 +43,7 @@ export function ReservationsDateFilter({
               className={cn(
                 "rounded-lg px-3 py-2 text-left text-[14px] transition-colors",
                 mode === p.mode
-                  ? "bg-[oklch(0.98_0.008_258)] font-semibold text-primary"
+                  ? "bg-accent-soft font-bold text-primary"
                   : "hover:bg-accent",
               )}
             >
@@ -66,7 +68,7 @@ export function ReservationsDateFilter({
               setOpen(false);
             }}
             className={cn(
-              "mx-1 w-[calc(100%-8px)] rounded-lg border border-input px-2.5 py-1.5 font-mono text-[13px] text-foreground outline-none",
+              "mx-1 w-[calc(100%-8px)] rounded-lg border border-input px-2.5 py-1.5 font-display text-[13px] text-foreground outline-none",
               mode === "custom" && "border-primary",
             )}
           />

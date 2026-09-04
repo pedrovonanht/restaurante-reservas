@@ -36,7 +36,6 @@ export default function NovoEventoPage() {
 
   const [preset, setPreset] = useState("none");
   const [name, setName] = useState("");
-  const [capacity, setCapacity] = useState("");
   const [eventDate, setEventDate] = useState(todayISO());
   const [active, setActive] = useState(true);
   const [times, setTimes] = useState(["19:30", "20:30"]);
@@ -52,7 +51,6 @@ export default function NovoEventoPage() {
     const p = presets.find((x) => x.id === value);
     if (p) {
       setName(p.name);
-      setCapacity(p.capacity != null ? String(p.capacity) : "");
       if (p.event_times?.length) setTimes(p.event_times);
     }
   }
@@ -61,7 +59,6 @@ export default function NovoEventoPage() {
     e.preventDefault();
     const errors = validateEvent({
       name,
-      capacity,
       event_date: eventDate,
       event_times: times,
     });
@@ -74,7 +71,6 @@ export default function NovoEventoPage() {
       event_times: times,
       active,
     };
-    if (capacity !== "") input.capacity = Number(capacity);
     if (preset !== "none") input.preset_id = preset;
 
     try {
@@ -87,14 +83,14 @@ export default function NovoEventoPage() {
 
   return (
     <AppShell>
-      <BackHeader title="Criar evento" titleClassName="text-[17px]" />
+      <BackHeader title="Criar evento" />
 
       <form
         onSubmit={onSubmit}
         className="flex flex-col gap-4 px-5 py-4"
         noValidate
       >
-        <p className="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+        <p className="text-[11px] font-extrabold tracking-[0.14em] text-muted-foreground uppercase">
           Informações básicas
         </p>
 
@@ -132,31 +128,6 @@ export default function NovoEventoPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="capacity">
-            Capacidade{" "}
-            <span className="font-normal text-muted-foreground">
-              (opcional)
-            </span>
-          </Label>
-          <Input
-            id="capacity"
-            type="number"
-            inputMode="numeric"
-            min="1"
-            placeholder="90"
-            value={capacity}
-            onChange={(e) => setCapacity(e.target.value)}
-            className="font-mono"
-            aria-invalid={!!fieldErrors.capacity}
-          />
-          {fieldErrors.capacity ? (
-            <p className="text-[12px] text-destructive">
-              {fieldErrors.capacity}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-1.5">
           <Label htmlFor="event-date">Data do evento</Label>
           <Input
             id="event-date"
@@ -164,7 +135,7 @@ export default function NovoEventoPage() {
             value={eventDate}
             min={todayISO()}
             onChange={(e) => setEventDate(e.target.value)}
-            className="font-mono"
+            className="font-display"
             aria-invalid={!!fieldErrors.event_date}
           />
           {fieldErrors.event_date ? (
@@ -174,9 +145,15 @@ export default function NovoEventoPage() {
           ) : null}
         </div>
 
-        <Card className="flex items-center justify-between gap-3 p-3.5">
+        <Card
+          className={
+            active
+              ? "flex items-center justify-between gap-3 border-success/40 bg-success-tint p-3.5"
+              : "flex items-center justify-between gap-3 p-3.5"
+          }
+        >
           <label htmlFor="event-active" className="flex-1 cursor-pointer">
-            <span className="block text-[15px] font-semibold text-foreground">
+            <span className="block text-[15px] font-bold text-foreground">
               Evento ativo
             </span>
             <span className="block text-[13px] text-muted-foreground">
@@ -200,14 +177,14 @@ export default function NovoEventoPage() {
         </div>
 
         {error ? (
-          <div className="rounded-[10px] border border-destructive/30 bg-destructive/5 px-3 py-2 text-[13px] text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-danger-tint px-3 py-2 text-[13px] text-destructive">
             {error.message}
           </div>
         ) : null}
 
         <Button
           type="submit"
-          className="mt-1 h-[50px] w-full rounded-xl text-[15px] font-bold hover:bg-primary/90"
+          className="mt-1 h-[50px] w-full rounded-lg text-[15px] font-bold hover:bg-primary/90"
           disabled={loading}
         >
           {loading ? "Criando…" : "Criar evento"}

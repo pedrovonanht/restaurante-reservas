@@ -15,11 +15,12 @@ import { useQuery } from "hooks/use-query";
 import { useTenant } from "context/tenant-context";
 import { reservations as reservationsApi } from "lib/api";
 import { resolveDateFilter, todayISO } from "lib/format";
+import { normalizePhone } from "lib/whatsapp";
 
 export default function HomePage() {
   const { tenant } = useTenant();
 
-  const [filterMode, setFilterMode] = useState("month");
+  const [filterMode, setFilterMode] = useState("next30");
   const [customDate, setCustomDate] = useState(todayISO());
   const { from, to, label } = useMemo(
     () => resolveDateFilter(filterMode, customDate),
@@ -46,7 +47,13 @@ export default function HomePage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return sorted;
-    return sorted.filter((r) => r.guest_name?.toLowerCase().includes(q));
+    const qDigits = normalizePhone(query);
+    return sorted.filter((r) => {
+      if (r.guest_name?.toLowerCase().includes(q)) return true;
+      if (r.table_name?.toLowerCase().includes(q)) return true;
+      if (qDigits && normalizePhone(r.guest_phone).includes(qDigits)) return true;
+      return false;
+    });
   }, [sorted, query]);
 
   // Primeiro card aberto por padrão (um aberto por vez). `undefined` = usar o primeiro.
@@ -75,9 +82,9 @@ export default function HomePage() {
           />
           <TenantSwitcher />
         </div>
-        <h1 className="mt-4 text-[34px] leading-none font-extrabold tracking-tight text-ink">
+        <h1 className="mt-4 font-display text-[34px] leading-none font-bold tracking-[-0.03em] text-ink">
           {loading ? "—" : list.length}{" "}
-          <span className="text-[oklch(0.45_0.02_262)]">
+          <span className="text-foreground">
             {list.length === 1 ? "reserva" : "reservas"}
           </span>
         </h1>
@@ -89,14 +96,14 @@ export default function HomePage() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por nome"
-            className="border-transparent bg-sunken pl-9"
-            aria-label="Buscar reservas por nome"
+            placeholder="Buscar por nome, mesa ou telefone"
+            className="pl-9"
+            aria-label="Buscar reservas por nome, mesa ou telefone"
           />
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <p className="font-mono text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+          <p className="text-[11px] font-extrabold tracking-[0.14em] text-muted-foreground uppercase">
             Reservas recentes
           </p>
 
@@ -111,7 +118,7 @@ export default function HomePage() {
               }
               description={
                 query
-                  ? "Tente buscar por outro nome."
+                  ? "Tente buscar por outro nome, mesa ou telefone."
                   : "As reservas desse período aparecerão aqui."
               }
             />

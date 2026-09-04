@@ -8,12 +8,13 @@ import { BackHeader } from "components/layout/back-header";
 import { MetricCard } from "components/common/metric-card";
 import { ErrorState } from "components/common/state-views";
 import { Card } from "components/ui/card";
+import { Badge } from "components/ui/badge";
 import { Progress } from "components/ui/progress";
 import { Button } from "components/ui/button";
 import { useQuery } from "hooks/use-query";
 import { useTenant } from "context/tenant-context";
 import { events as eventsApi } from "lib/api";
-import { formatDayMonth, formatTime, occupancyPercent } from "lib/format";
+import { formatDayMonth, formatTime, tableOccupancyPercent } from "lib/format";
 import { cn } from "lib/utils";
 
 export default function EventoDetalhePage() {
@@ -43,16 +44,17 @@ export default function EventoDetalhePage() {
 
   const oc = data?.ocupation || {
     reservations: 0,
-    capacity: data?.capacity || 0,
+    total_capacity: 0,
     people: 0,
+    empty_tables: 0,
   };
-  const pct = occupancyPercent(oc);
+  const pct = tableOccupancyPercent(oc);
+  const totalTables = oc.reservations + oc.empty_tables;
 
   return (
     <AppShell>
       <BackHeader
-        title="Visualização do evento"
-        titleClassName="text-[14px]"
+        title="Evento"
         right={
           id ? (
             <Link
@@ -76,12 +78,15 @@ export default function EventoDetalhePage() {
         ) : (
           <>
             <div className="text-center">
-              <h1 className="text-[30px] leading-tight font-extrabold tracking-tight text-foreground">
+              <h1 className="font-display text-[30px] leading-tight font-bold tracking-[-0.03em] text-foreground">
                 {data.name}
               </h1>
-              <p className="mt-1 font-mono text-[14px] text-muted-foreground">
-                {formatDayMonth(data.event_date)}
-              </p>
+              <div className="mt-1.5 flex items-center justify-center gap-2 text-[14px] font-medium text-muted-foreground">
+                <span>{formatDayMonth(data.event_date)}</span>
+                <Badge variant={data.active ? "success" : "warning"}>
+                  {data.active ? "ativa" : "encerrada"}
+                </Badge>
+              </div>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
@@ -91,9 +96,9 @@ export default function EventoDetalhePage() {
 
             <Card className="mt-3 p-4">
               <div className="flex items-center justify-between text-[13px]">
-                <span className="text-muted-foreground">Ocupação</span>
-                <span className="font-mono text-foreground">
-                  {oc.reservations}/{oc.capacity}
+                <span className="text-muted-foreground">Mesas ocupadas</span>
+                <span className="font-display text-foreground">
+                  {oc.reservations}/{totalTables}
                 </span>
               </div>
               <Progress value={pct} className="mt-2" />
@@ -106,7 +111,7 @@ export default function EventoDetalhePage() {
                   {data.event_times.map((time) => (
                     <span
                       key={time}
-                      className="rounded-full bg-sunken px-3 py-1 font-mono text-[13px] text-foreground"
+                      className="rounded-md bg-accent-soft px-3 py-1 font-display text-[13px] font-medium text-primary"
                     >
                       {formatTime(time)}
                     </span>
@@ -118,10 +123,10 @@ export default function EventoDetalhePage() {
             <Button
               onClick={copyLink}
               className={cn(
-                "mt-auto h-[52px] w-full rounded-xl text-[14px] font-bold tracking-[0.06em] uppercase",
+                "mt-auto h-[52px] w-full rounded-lg text-[14px] font-bold tracking-[0.06em] uppercase",
                 copied
-                  ? "border border-success bg-[oklch(0.96_0.04_155)] text-success hover:bg-[oklch(0.96_0.04_155)]"
-                  : "bg-ink text-white hover:bg-ink/90",
+                  ? "bg-success-tint text-success hover:bg-success-tint"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90",
               )}
             >
               {copied ? "Link copiado" : "Copiar link"}
