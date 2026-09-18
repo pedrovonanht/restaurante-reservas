@@ -2,7 +2,7 @@
 
 
 # Sobre o projeto
-Um saas (multi-tenant) de gerenciamento de reservas de mesas, desde o dashboard de gerenciamento até o link de reserva para o cliente. Foi desenvolvido em parceria com neptunia restaurante a partir de uma necessidade real de gestão das reservas. O projeto busca diminuir o trabalho manual de troca de mensagens por whatsapp e alocação de mesas automatizando o processo para o cliente bastando preencher um formulário simples para efetuar a reserva.
+Um sistema (multi-tenant) de gerenciamento de reservas de mesas, desde o dashboard de gerenciamento até o link de reserva para o cliente. Foi desenvolvido em parceria com neptunia restaurante a partir de uma necessidade real de gestão das reservas. O projeto busca diminuir o trabalho manual de troca de mensagens por whatsapp e alocação de mesas automatizando o processo para o cliente bastando preencher um formulário simples para efetuar a reserva.
 
 # O problema
 Hoje em muitos restaurantes reservas são gerenciadas manualmente via whatsapp com a alocação de mesa sendo feita manualmente, esse processo gera desafios como:
