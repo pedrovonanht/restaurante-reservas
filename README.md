@@ -1,4 +1,5 @@
-<img width="1920" height="1080" alt="speedup" src="https://github.com/user-attachments/assets/1219a98e-a085-461b-a660-574f1a3b6148" />
+<img width="1032" height="1077" alt="speedup-croped" src="https://github.com/user-attachments/assets/ce162849-1fe0-4572-b4d0-b7da6d491b03" />
+
 
 # Sobre o projeto
 Um saas (multi-tenant) de gerenciamento de reservas de mesas, desde o dashboard de gerenciamento até o link de reserva para o cliente. Foi desenvolvido em parceria com neptunia restaurante a partir de uma necessidade real de gestão das reservas. O projeto busca diminuir o trabalho manual de troca de mensagens por whatsapp e alocação de mesas automatizando o processo para o cliente bastando preencher um formulário simples para efetuar a reserva.
