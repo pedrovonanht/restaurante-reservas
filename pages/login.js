@@ -51,6 +51,12 @@ export default function LoginPage() {
           <Link href="/register" className="font-semibold text-primary">
             Criar conta
           </Link>
+          <span className="mt-3 block">
+            Ainda não conhece?{" "}
+            <Link href="/conheca" className="font-semibold text-primary">
+              Veja o Tablefy
+            </Link>
+          </span>
         </>
       }
     >
