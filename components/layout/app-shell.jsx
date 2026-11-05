@@ -35,7 +35,7 @@ function NoRestaurantLocked() {
 }
 
 // Frame gateado do painel: coluna central (mobile-first) + nav inferior.
-// Redireciona para /login sem sessão e mostra a mensagem de acesso restrito
+// Redireciona sem sessão (/ → /conheca, demais → /login) e mostra a mensagem de acesso restrito
 // quando não há tenant. Cada página controla o próprio header e o padding do conteúdo.
 export function AppShell({ children, requireTenant = true }) {
   const { user, loading: authLoading } = useAuth();
@@ -43,7 +43,8 @@ export function AppShell({ children, requireTenant = true }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && !user) router.replace("/login");
+    if (!authLoading && !user)
+      router.replace(router.pathname === "/" ? "/conheca" : "/login");
   }, [authLoading, user, router]);
 
   if (authLoading || !user) return <FullScreenLoader />;

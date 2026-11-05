@@ -36,7 +36,7 @@ import { waLink } from "lib/whatsapp";
 // Vazio = o botão "Falar com a gente" não aparece.
 const CONTACT_WHATSAPP = "";
 const CONTACT_MESSAGE =
-  "Olá! Vi o Tablefy e quero levar as reservas online para o meu restaurante.";
+  "Olá! Vi o Flamba e quero levar as reservas online para o meu restaurante.";
 
 const contactHref = CONTACT_WHATSAPP
   ? waLink(CONTACT_WHATSAPP, CONTACT_MESSAGE)
@@ -142,7 +142,7 @@ function Hero() {
             Salão cheio, zero overbooking e menos horas no WhatsApp.
           </h1>
           <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-ink-soft">
-            O Tablefy transforma suas reservas em um link. O cliente reserva
+            O Flamba transforma suas reservas em um link. O cliente reserva
             sozinho em quatro campos, o sistema escolhe a mesa certa e sua
             equipe acompanha tudo pelo celular. Você para de responder mensagem
             e volta a cuidar do salão.
@@ -183,7 +183,8 @@ function Hero() {
             <PhoneFrame
               label="Painel do restaurante mostrando a ocupação do evento"
               className="z-10 sm:mt-16 sm:-ml-20 sm:rotate-[3deg]"
-            >
+            > 
+            
               <OwnerEventScreen />
             </PhoneFrame>
           </div>
@@ -322,7 +323,7 @@ function SmartAllocation() {
             A mesa certa para cada grupo, automaticamente.
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed text-white/75">
-            O Tablefy olha só para as mesas livres que comportam o grupo e
+            O Flamba olha só para as mesas livres que comportam o grupo e
             escolhe a de menor capacidade. Um casal não ocupa a mesa de seis. As
             mesas grandes ficam livres para os grupos grandes e cabe mais gente
             no salão na mesma noite.
@@ -496,7 +497,7 @@ function Origin() {
             Criado junto com um restaurante de verdade.
           </h2>
           <p className="mt-4 text-[16px] leading-relaxed text-ink-soft">
-            O Tablefy foi desenvolvido em parceria com o Neptunia Restaurante, a
+            O Flamba foi desenvolvido em parceria com o Neptunia Restaurante, a
             partir de um problema que eles tinham todo fim de semana: reservas
             demais pelo WhatsApp e mesas alocadas na mão. Cada tela foi pensada
             para o ritmo de quem está atendendo, não para quem está num
@@ -609,7 +610,7 @@ function FinalCta() {
     <section className="px-5 pb-20">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-primary px-6 py-14 text-center text-primary-foreground sm:px-12">
         <h2 className="mx-auto max-w-2xl font-display text-[30px] leading-[1.1] font-bold tracking-[-0.03em] sm:text-[42px]">
-          Veja o Tablefy funcionando agora.
+          Veja o Flamba funcionando agora.
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-primary-foreground/80">
           Faça uma reserva como cliente e veja ela chegar no painel do
@@ -661,14 +662,15 @@ export default function ConhecaPage() {
   return (
     <>
       <Head>
-        <title>Tablefy · Reservas online para restaurantes</title>
+        <link rel="icon" href="/flamba-icon.png" />
+        <title>Flamba · Reservas online para restaurantes</title>
         <meta
           name="description"
-          content="Transforme suas reservas em um link. O cliente reserva sozinho, o Tablefy escolhe a mesa certa e sua equipe acompanha tudo pelo celular."
+          content="Transforme suas reservas em um link. O cliente reserva sozinho, o Flamba escolhe a mesa certa e sua equipe acompanha tudo pelo celular."
         />
         <meta
           property="og:title"
-          content="Tablefy · Reservas online para restaurantes"
+          content="Flamba · Reservas online para restaurantes"
         />
         <meta
           property="og:description"

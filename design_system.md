@@ -1,4 +1,4 @@
-# Design System — Tablefy
+# Design System — Flamba
 
 Especificação do design system aplicado ao client (painel do dono + páginas públicas de
 reserva). Fonte de design: Figma, arquivo "PROJETO-TABLEFY", node `4-1119` ("final design
@@ -40,11 +40,11 @@ Fundo quente (areia), ação em azul-noite, estado em verde.
 
 **Páginas públicas de reserva** (`components/public/public-shell.jsx`, `NEUTRAL_VARS`):
 sobrescrevem `--primary`/`--secondary`/`--accent-soft`/`--ring` para tons de ink (`#16203A`
-/ `#EFE8DA`), mantendo a ação **neutra** — nenhum restaurante deve ver a marca Tablefy (azul)
+/ `#EFE8DA`), mantendo a ação **neutra** — nenhum restaurante deve ver a marca Flamba (azul)
 nas telas do próprio convidado. Tipografia e superfícies do DS se aplicam normalmente.
 
 Dark mode: fora de escopo do DS atual (o bloco `.dark` em `globals.css` mantém a paleta
-shadcn neutra antiga, não a paleta Tablefy).
+shadcn neutra antiga, não a paleta Flamba).
 
 ## Tipografia
 

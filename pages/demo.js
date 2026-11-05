@@ -109,7 +109,7 @@ function DemoApp({ onReset }) {
       <div className="flex flex-col gap-5 pt-10 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
           <h1 className="font-display text-[32px] leading-[1.05] font-bold tracking-[-0.03em] text-foreground sm:text-[42px]">
-            Teste o Tablefy na prática.
+            Teste o Flamba na prática.
           </h1>
           <p className="mt-3 text-[16px] leading-relaxed text-ink-soft">
             À esquerda, o que seu cliente vê ao abrir o link de reserva. À
@@ -210,7 +210,8 @@ export default function DemoPage() {
   return (
     <>
       <Head>
-        <title>Demo interativa · Tablefy</title>
+        <link rel="icon" href="/flamba-icon.png" />
+        <title>Demo interativa · Flamba</title>
         <meta
           name="description"
           content="Faça uma reserva como cliente e veja ela chegar no painel do restaurante, com a mesa escolhida automaticamente."

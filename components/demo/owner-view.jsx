@@ -239,34 +239,31 @@ function TablesTab({ state, highlightTableId, onToggleTable }) {
           {oc.reservations}/{oc.totalTables} ocupadas
         </span>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2.5">
+      <div className="mt-4 flex flex-col gap-2.5">
         {state.tables.map((t) => {
           const r = byTable.get(t.id);
           const isNew = highlightTableId === t.id;
           return (
-            <div
+            <Card
               key={t.id}
               className={cn(
-                "rounded-lg border p-2.5 transition-all",
-                r
-                  ? "border-success/25 bg-success-tint"
-                  : t.active
-                    ? "border-border bg-card"
-                    : "border-dashed border-border bg-surface-alt",
+                "p-3.5 transition-all",
+                r && "border-success/25 bg-success-tint",
+                !r && !t.active && "border-dashed bg-surface-alt",
                 isNew && "border-success ring-3 ring-success/25",
               )}
             >
-              <div className="flex items-center justify-between gap-1">
-                <span
+              <div className="flex items-center justify-between gap-3">
+                <h4
                   className={cn(
-                    "truncate font-display text-[14px] font-bold",
+                    "min-w-0 truncate font-display text-base font-bold",
                     t.active || r ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {t.name}
-                </span>
-                <span className="flex shrink-0 items-center gap-0.5 font-display text-[11px] text-muted-foreground">
-                  <Users className="size-3" />
+                </h4>
+                <span className="flex shrink-0 items-center gap-1 font-display text-[13px] text-muted-foreground">
+                  <Users className="size-3.5" />
                   {t.min_capacity}–{t.max_capacity}
                 </span>
               </div>
@@ -276,19 +273,19 @@ function TablesTab({ state, highlightTableId, onToggleTable }) {
                   {formatTime(r.reservation_time)}
                 </p>
               ) : (
-                <div className="mt-1.5 flex items-center justify-between">
+                <div className="mt-2 flex items-center justify-between gap-3">
                   <span className="text-[12px] font-medium text-muted-foreground">
                     {t.active ? "livre" : "desativada"}
                   </span>
                   <Switch
-                    className="origin-right scale-[0.75]"
+                    className="h-6 w-10 [&>span]:size-[18px] [&>span]:data-[state=checked]:translate-x-[18px]"
                     checked={t.active}
                     onCheckedChange={() => onToggleTable(t.id)}
                     aria-label={`${t.active ? "Desativar" : "Ativar"} ${t.name}`}
                   />
                 </div>
               )}
-            </div>
+            </Card>
           );
         })}
       </div>

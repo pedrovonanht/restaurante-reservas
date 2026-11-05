@@ -54,7 +54,7 @@ export default function LoginPage() {
           <span className="mt-3 block">
             Ainda não conhece?{" "}
             <Link href="/conheca" className="font-semibold text-primary">
-              Veja o Tablefy
+              Veja o Flamba
             </Link>
           </span>
         </>

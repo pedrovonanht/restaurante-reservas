@@ -84,7 +84,7 @@ function ErrorResult({ attempt }) {
         <p className="mt-1 text-[14px] leading-relaxed text-ink-soft">
           {noTable
             ? "A reserva foi recusada em vez de virar overbooking. O cliente é avisado na hora e pode escolher outra data."
-            : "O Tablefy impede que o mesmo cliente ocupe duas mesas na mesma noite."}
+            : "O Flamba impede que o mesmo cliente ocupe duas mesas na mesma noite."}
         </p>
       </div>
     </div>
@@ -101,7 +101,7 @@ export function AllocationExplainer({ attempt, onSeePanel }) {
         <div className="mt-3">
           {!attempt ? (
             <p className="text-[14px] leading-relaxed text-ink-soft">
-              Preencha a reserva como se fosse o cliente. Ao enviar, o Tablefy
+              Preencha a reserva como se fosse o cliente. Ao enviar, o Flamba
               procura as mesas livres que comportam o grupo e escolhe a de menor
               capacidade. O resultado aparece aqui e no painel do restaurante.
             </p>
@@ -141,7 +141,7 @@ export function AllocationExplainer({ attempt, onSeePanel }) {
           href="/conheca"
           className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold underline-offset-4 hover:underline"
         >
-          Conhecer o Tablefy <ArrowRight className="size-4" />
+          Conhecer o Flamba <ArrowRight className="size-4" />
         </Link>
       </div>
     </div>
