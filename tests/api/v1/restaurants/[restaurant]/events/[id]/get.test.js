@@ -18,7 +18,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -31,7 +31,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
       });
     });
@@ -46,7 +46,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite Cancelada",
-        event_date: "2026-08-02",
+        event_date: "2099-08-02",
         event_times: ["19:30"],
         active: false,
       });
@@ -92,7 +92,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -113,7 +113,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       const responseBody = await response.json();
       expect(responseBody).toEqual({
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
       });
     });
@@ -128,7 +128,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -155,7 +155,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       expect(responseBody).toEqual({
         id: createdEvent.id,
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
         preset_id: null,
@@ -175,7 +175,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -233,7 +233,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       expect(responseBody).toEqual({
         id: createdEvent.id,
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
         preset_id: null,
@@ -253,7 +253,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/events/[id]`", () => {
       );
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite Cancelada",
-        event_date: "2026-08-02",
+        event_date: "2099-08-02",
         event_times: ["19:30"],
         active: false,
       });

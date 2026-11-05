@@ -117,7 +117,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
 
       const created_event = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -228,7 +228,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
 
       const created_event = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
@@ -329,14 +329,14 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
 
       const created_event = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-08-01",
+        event_date: "2099-08-01",
         event_times: ["19:30"],
         active: true,
       });
 
       const created_event2 = await orchestrator.createEvent(createdRestaurant.id, {
         name: "Noite de Fondue",
-        event_date: "2026-09-02",
+        event_date: "2099-09-02",
         event_times: ["19:30"],
         active: true,
       });
@@ -375,7 +375,7 @@ describe("GET in `api/v1/restaurants/[restaurant]/reservations`", () => {
       })
 
       const response = await fetch(
-        `http://localhost:3000/api/v1/restaurants/${createdRestaurant.slug}/reservations?from=2026-08-01&to=2026-08-01`,
+        `http://localhost:3000/api/v1/restaurants/${createdRestaurant.slug}/reservations?from=2099-08-01&to=2099-08-01`,
         {
           headers: {
             Cookie: `session_id=${sessionObject.token}`,

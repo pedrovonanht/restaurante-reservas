@@ -17,7 +17,7 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -36,7 +36,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "5",
           guest_name: "Carlos",
@@ -75,7 +75,7 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -100,7 +100,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "4",
           guest_name: "Carlos",
@@ -127,7 +127,7 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -152,7 +152,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "2",
           guest_name: "Carlos",
@@ -169,7 +169,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "2",
           guest_name: "Gomez",
@@ -194,13 +194,13 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
 
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-09-21",
+        event_date: "2099-09-21",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Other event",
       })
@@ -218,7 +218,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "2",
           guest_name: "Carlos",
@@ -235,7 +235,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-09-21",
+          reservation_date: "2099-09-21",
           reservation_time: "19:30",
           party_size: "2",
           guest_name: "Gomez",
@@ -274,7 +274,7 @@ describe("POST in `api/v1/restaurants`", () => {
 
 
       await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Best Fit event",
       })
@@ -307,7 +307,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "4",
           guest_name: "Carlos",
@@ -320,7 +320,7 @@ describe("POST in `api/v1/restaurants`", () => {
 
       // table chosen assertions
       const response2 = await fetch(
-        `http://localhost:3000/api/v1/restaurants/${createdRestaurant.slug}/reservations?from=2026-08-20&to=2026-08-20`,
+        `http://localhost:3000/api/v1/restaurants/${createdRestaurant.slug}/reservations?from=2099-08-20&to=2099-08-20`,
         {
           headers: {
             Cookie: `session_id=${sessionObject.token}`,
@@ -339,7 +339,7 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       const createdEvent =  await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -358,7 +358,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "15",
           guest_name: "Carlos",
@@ -394,7 +394,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "19:30",
           party_size: "15",
           guest_name: "Carlos alvarez",
@@ -418,7 +418,7 @@ describe("POST in `api/v1/restaurants`", () => {
       });
 
       await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -429,7 +429,7 @@ describe("POST in `api/v1/restaurants`", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          reservation_date: "2026-08-20",
+          reservation_date: "2099-08-20",
           reservation_time: "27:24",
           party_size: "2",
           guest_name: "Carlos",
