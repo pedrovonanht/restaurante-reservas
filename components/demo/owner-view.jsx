@@ -210,13 +210,15 @@ function EventTab({ state, onOpenGuestLink }) {
           ))}
         </div>
       </Card>
-      <button
-        type="button"
-        onClick={onOpenGuestLink}
-        className="mt-auto flex h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-primary text-[13px] font-bold tracking-[0.06em] text-primary-foreground uppercase transition-colors hover:bg-primary/90"
-      >
-        <Link2 className="size-4" /> Abrir link do cliente
-      </button>
+      <div className="mt-auto pt-4">
+        <button
+          type="button"
+          onClick={onOpenGuestLink}
+          className="flex h-[48px] w-full items-center justify-center gap-2 rounded-lg bg-primary text-[13px] font-bold tracking-[0.06em] text-primary-foreground uppercase transition-colors hover:bg-primary/90"
+        >
+          <Link2 className="size-4" /> Abrir link do cliente
+        </button>
+      </div>
     </div>
   );
 }

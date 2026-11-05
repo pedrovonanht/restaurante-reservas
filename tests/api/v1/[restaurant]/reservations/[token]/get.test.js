@@ -16,7 +16,7 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         name: "validRestaurant",
       });
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })
@@ -62,7 +62,7 @@ describe("GET in `api/v1/[restaurant]/[token]`", () => {
         name: "invalidTokenRestaurant",
       });
       const createdEvent = await orchestrator.createEvent(createdRestaurant.id, {
-        event_date: "2026-08-20",
+        event_date: "2099-08-20",
         event_times: ["19:30", "20:30", "21:30"],
         name: "Same Event",
       })

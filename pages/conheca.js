@@ -139,8 +139,7 @@ function Hero() {
             Reservas online para restaurantes
           </span>
           <h1 className="mt-5 font-display text-[40px] leading-[1.02] font-bold tracking-[-0.035em] text-foreground sm:text-[56px]">
-            Salão cheio, zero overbooking e menos horas no WhatsApp.
-          </h1>
+Lote o próximo evento com tráfego pago, sem uma mensagem no WhatsApp.          </h1>
           <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-ink-soft">
             O Flamba transforma suas reservas em um link. O cliente reserva
             sozinho em quatro campos, o sistema escolhe a mesa certa e sua
@@ -184,7 +183,7 @@ function Hero() {
               label="Painel do restaurante mostrando a ocupação do evento"
               className="z-10 sm:mt-16 sm:-ml-20 sm:rotate-[3deg]"
             > 
-            
+
               <OwnerEventScreen />
             </PhoneFrame>
           </div>
